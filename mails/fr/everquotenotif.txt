@@ -1,0 +1,8 @@
+
+ 
+
+Un nouveau devis a été passé par {firstname} {lastname}
+
+Merci de vous rendre sur {shop_name} afin de le télécharger
+
+{shop_name} 

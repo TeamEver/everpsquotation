@@ -1,0 +1,10 @@
+
+ 
+
+Bonjour {firstname} {lastname},
+
+Merci d'avoir effectué votre devis sur {shop_name}! 
+
+Vous pouvez passer commande à tout moment sur notre boutique
+
+{shop_name} 

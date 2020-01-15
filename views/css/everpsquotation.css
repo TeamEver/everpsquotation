@@ -1,0 +1,17 @@
+#ever_quantity_wanted {
+    color: #232323;
+    background-color: #fff;
+    height: 2.75rem;
+    padding: .175rem .5rem;
+    width: 3rem;
+}
+.quote_unlogged, .quote_noaddress {
+    border: none!important;
+    background-color:grey!important;
+}
+.quote_unlogged p, .quote_noaddress p {
+    color:#FFF!important;
+}
+.quote_unlogged p .bold, .quote_noaddress p .bold {
+    font-weight: bold;
+}
