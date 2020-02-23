@@ -142,7 +142,7 @@
            <th class="header small" align="right">{l s='Product quantity' mod='everpsquotation'}</th>
            <th class="header small" align="right">{l s='Product price wt' mod='everpsquotation'}</th>
            <th class="header small" align="right">{l s='Total product price wt' mod='everpsquotation'}</th>
-       </tr> 
+       </tr>
     </thead>
     <tbody>
         {foreach from=$details item=value}
@@ -159,7 +159,7 @@
                     {foreach from=$customizations item=customization}
                     {if $customization.product_id == $value.product_id}
                         {foreach from=$customization.customizations item=$cust}
-                            {$cust|escape:'htmlall':'UTF-8'}<br>                       
+                            {$cust|escape:'htmlall':'UTF-8'}<br>
                         {/foreach}
                     {/if}
                     {/foreach}
@@ -188,7 +188,7 @@
                 {l s='Total products wt' mod='everpsquotation'}
             </td>
             <td align="right" style="border-top:1px solid #808080;">
-                {convertPrice price=$total_products_wt}
+                {convertPrice price=$total_products}
             </td>
         </tr>
         <tr>
@@ -197,7 +197,7 @@
                 {l s='Total carrier wt' mod='everpsquotation'}
             </td>
             <td align="right" style="">
-                {convertPrice price=$total_shipping_tax_excl}
+                {convertPrice price=$total_shipping}
             </td>
         </tr>
         <tr>

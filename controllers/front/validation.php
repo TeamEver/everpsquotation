@@ -70,18 +70,18 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
         $quote->secure_key = (string)$cart->secure_key;
         $quote->recyclable = (int)$cart->recyclable;
         $quote->total_discounts = (float)$cartdetails['total_discounts'];
-        $quote->total_discounts_tax_incl = (float)$cartdetails['total_discounts_tax_exc'];
+        $quote->total_discounts_tax_incl = (float)$cartdetails['total_discounts'];
         $quote->total_discounts_tax_excl = (float)$cartdetails['total_discounts_tax_exc'];
         $quote->total_paid_tax_incl = (float)$cartdetails['total_price'];
         $quote->total_paid_tax_excl = (float)$cartdetails['total_price_without_tax'];
         $quote->total_products = (float)$cartdetails['total_products'];
-        $quote->total_products_wt = (float)$cartdetails['total_products'];
+        $quote->total_products_wt = (float)$cartdetails['total_products_wt'];
         $quote->total_shipping = (float)$cartdetails['total_shipping'];
-        $quote->total_shipping_tax_incl = (float)$cartdetails['total_shipping_tax_exc'];
+        $quote->total_shipping_tax_incl = (float)$cartdetails['total_shipping'];
         $quote->total_shipping_tax_excl = (float)$cartdetails['total_shipping_tax_exc'];
         $quote->total_wrapping = (float)$cartdetails['total_wrapping'];
         $quote->total_wrapping_tax_incl = (float)$cartdetails['total_wrapping_tax_exc'];
-        $quote->total_wrapping_tax_excl = (float)$cartdetails['total_wrapping_tax_exc'];
+        $quote->total_wrapping_tax_excl = (float)$cartdetails['total_wrapping'];
         $quote->valid = 0;
         $quote->date_add = $cart->date_add;
         $quote->date_upd = $cart->date_upd;
@@ -109,9 +109,9 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             $quotedetail->product_weight = (float)$cartproduct['weight'];
             $quotedetail->tax_name = (string)$cartproduct['tax_name'];
             $quotedetail->ecotax = (float)$cartproduct['ecotax'];
-            $quotedetail->unit_price_tax_excl = (float)$cartproduct['price_wt'];
-            $quotedetail->total_price_tax_incl = (float)$cartproduct['total'];
-            $quotedetail->total_price_tax_excl = (float)$cartproduct['total_wt'];
+            $quotedetail->unit_price_tax_excl = (float)$cartproduct['price'];
+            $quotedetail->total_price_tax_incl = (float)$cartproduct['total_wt'];
+            $quotedetail->total_price_tax_excl = (float)$cartproduct['total'];
             $quotedetail->add();
         }
 
