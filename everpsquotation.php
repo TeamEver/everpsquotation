@@ -30,7 +30,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.13';
+        $this->version = '2.2.14';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
