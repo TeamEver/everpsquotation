@@ -80,8 +80,8 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
         $quote->total_shipping_tax_incl = (float)$cartdetails['total_shipping'];
         $quote->total_shipping_tax_excl = (float)$cartdetails['total_shipping_tax_exc'];
         $quote->total_wrapping = (float)$cartdetails['total_wrapping'];
-        $quote->total_wrapping_tax_incl = (float)$cartdetails['total_wrapping_tax_exc'];
-        $quote->total_wrapping_tax_excl = (float)$cartdetails['total_wrapping'];
+        $quote->total_wrapping_tax_incl = (float)$cartdetails['total_wrapping'];
+        $quote->total_wrapping_tax_excl = (float)$cartdetails['total_wrapping_tax_exc'];
         $quote->valid = 0;
         $quote->date_add = $cart->date_add;
         $quote->date_upd = $cart->date_upd;
