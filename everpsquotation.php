@@ -940,6 +940,60 @@ class Everpsquotation extends PaymentModule
             $quotedetail->add();
         }
         EverpsquotationCart::deleteEverQuoteCart((int)$id_evercart);
+        //Preparing emails
+        if (Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL')) {
+            $everShopEmail = Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL');
+        } else {
+            $everShopEmail = Configuration::get('PS_SHOP_EMAIL');
+        }
+        // Subject
+        $ever_subject = Configuration::getInt('EVERPSQUOTATION_MAIL_SUBJECT');
+        $subject = $ever_subject[(int)Context::getContext()->language->id];
+        // Filename
+        $filename = Configuration::getInt('EVERPSQUOTATION_FILENAME');
+        $ever_filename = $filename[(int)Context::getContext()->language->id];
+
+        $id_shop = (int)Context::getContext()->shop->id;
+        $mailDir = _PS_MODULE_DIR_.'everpsquotation/mails/';
+        $mailpdf = new PDF($quoteid, 'EverQuotationPdf', Context::getContext()->smarty);
+        $customer = new Customer(
+            (int)Context::getContext()->customer->id
+        );
+        $customerNames = $customer->firstname.' '.$customer->lastname;
+        $attachment = array();
+        $attachment['content'] = $mailpdf->render(false);
+        $attachment['name'] = $ever_filename;
+        $attachment['mime'] = 'application/pdf';
+
+        //Send customer email
+        $sent = Mail::send(
+            (int)Context::getContext()->language->id,
+            'everquotecustomer',
+            (string)$subject,
+            array(
+                '{shop_name}'=>Configuration::get('PS_SHOP_NAME'),
+                '{shop_logo}'=>_PS_IMG_DIR_.Configuration::get(
+                    'PS_LOGO',
+                    null,
+                    null,
+                    (int)$id_shop
+                ),
+                '{firstname}' => (string)$customer->firstname,
+                '{lastname}' => (string)$customer->lastname,
+            ),
+            (string)$customer->email,
+            (string)$customerNames,
+            (string)$everShopEmail,
+            Configuration::get('PS_SHOP_NAME'),
+            $attachment,
+            null,
+            $mailDir,
+            false,
+            null,
+            (string)$everShopEmail,
+            (string)$everShopEmail,
+            Configuration::get('PS_SHOP_NAME')
+        );
         require_once _PS_MODULE_DIR_ . 'everpsquotation/models/HTMLTemplateEverQuotationPdf.php';
         $pdf = new PDF($quoteid, 'EverQuotationPdf', Context::getContext()->smarty);
         $pdf->render();
