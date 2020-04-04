@@ -30,7 +30,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.14';
+        $this->version = '2.2.15';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -869,7 +869,9 @@ class Everpsquotation extends PaymentModule
                 (int)$this->context->language->id,
                 (int)$this->context->shop->id
             );
-            $productPrice = Product::getPriceStatic((int)$product->id);
+            $productPrice = Product::getPriceStatic(
+                (int)$product->id
+            );
             $total_products += ($productPrice * $quoteProduct['quantity']);
             $total_products_wt += ($product->price * $quoteProduct['quantity']);
         }
@@ -940,7 +942,9 @@ class Everpsquotation extends PaymentModule
             $quotedetail->add();
         }
         EverpsquotationCart::deleteEverQuoteCart((int)$id_evercart);
+
         //Preparing emails
+        require_once _PS_MODULE_DIR_ . 'everpsquotation/models/HTMLTemplateEverQuotationPdf.php';
         if (Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL')) {
             $everShopEmail = Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL');
         } else {
@@ -994,7 +998,7 @@ class Everpsquotation extends PaymentModule
             (string)$everShopEmail,
             Configuration::get('PS_SHOP_NAME')
         );
-        require_once _PS_MODULE_DIR_ . 'everpsquotation/models/HTMLTemplateEverQuotationPdf.php';
+        // Render PDF for direct download
         $pdf = new PDF($quoteid, 'EverQuotationPdf', Context::getContext()->smarty);
         $pdf->render();
     }
