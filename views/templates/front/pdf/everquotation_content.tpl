@@ -27,6 +27,9 @@
                     <td>{$customerInfos->email|escape:'htmlall':'UTF-8'}</td>
                 </tr>
                 <tr>
+                    <td>{$customerAddress->phone|escape:'htmlall':'UTF-8'}</td>
+                </tr>
+                <tr>
                     <td>{$customerAddress->address1|escape:'htmlall':'UTF-8'}</td>
                 </tr>
                 {if $customerAddress->address2|escape:'htmlall':'UTF-8'}
@@ -65,6 +68,10 @@
                 </tr>
                 <tr>
                     <td>{$customerInfos->email|escape:'htmlall':'UTF-8'}</td>
+                </tr>
+                </tr>
+                <tr>
+                    <td>{$customerAddressDelivery->phone|escape:'htmlall':'UTF-8'}</td>
                 </tr>
                 <tr>
                     <td>{$customerAddressDelivery->address1|escape:'htmlall':'UTF-8'}</td>
