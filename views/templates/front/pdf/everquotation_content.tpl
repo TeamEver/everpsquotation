@@ -69,7 +69,6 @@
                 <tr>
                     <td>{$customerInfos->email|escape:'htmlall':'UTF-8'}</td>
                 </tr>
-                </tr>
                 <tr>
                     <td>{$customerAddressDelivery->phone|escape:'htmlall':'UTF-8'}</td>
                 </tr>

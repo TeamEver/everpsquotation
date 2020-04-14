@@ -15,7 +15,7 @@
         </td>
         <td style="width: 50%" align="center" valign="middle">
             <h3>{l s='Quotation' mod='everpsquotation'} {if $prefix}{$prefix|escape:'htmlall':'UTF-8'}{/if}_{$id_everpsquotation_quotes|escape:'htmlall':'UTF-8'}</h3>
-            <h4>{$date_add|date_format:"%A %e %B %Y"|escape:'htmlall':'UTF-8'}</h4>
+            <h4>{$date_add|date_format:"%D"|escape:'htmlall':'UTF-8'}</h4>
             <h4>{$shop_name|escape:'htmlall':'UTF-8'}</h4>
             <span>{$shop_address|escape:'htmlall':'UTF-8'}</span>
         </td>
