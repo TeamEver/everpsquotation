@@ -8,7 +8,7 @@
 <table style="width: 100%;">
     <tr>
         <td style="text-align: center; font-size: 6pt; color: #444;  width:100%;">
-            {if isset($everpsquotationtext)}{$everpsquotationtext|escape:'html':'UTF-8'}{/if}
+            {if isset($everpsquotationtext)}{$everpsquotationtext nofilter}{/if}
         </td>
     </tr>
 </table>
