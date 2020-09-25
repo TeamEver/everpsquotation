@@ -23,16 +23,12 @@
             <a href="https://addons.prestashop.com/fr/seo-referencement-naturel/39489-ever-ultimate-seo.html" target="_blank">{l s='See the best SEO module on Prestashop Addons' mod='everpsquotation'}</a>
         </p>
     </div>
-    <div class="col-md-6">
-        <p class="alert alert-warning">
-            {l s='This module is free and will always be ! You can support our free modules by making a donation by clicking the button below' mod='everpsquotation'}
+    <div class="col-md-6 alert alert-warning">
+        <p>
+            {l s='Do you need more functions for your quotes on your shop ?' mod='everpsquotation'}
         </p>
-        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-        <input type="hidden" name="cmd" value="_s-xclick" />
-        <input type="hidden" name="hosted_button_id" value="3LE8ABFYJKP98" />
-        <input type="image" src="https://www.team-ever.com/wp-content/uploads/2019/06/appel_a_dons-1.jpg" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Bouton Faites un don avec PayPal" />
-        <img alt="" border="0" src="https://www.paypal.com/fr_FR/i/scr/pixel.gif" width="1" height="1" />
-        </form>
+            <a href="https://www.store-opart.fr/p/25-devis.html#ae35-4" target="_blank">{l s='Have a look on our partner module, you will be able to create quotes from your back-office !' mod='everpsquotation'}</a>
+        </p>
     </div>
     <div class="col-md-12">
 		<p class="alert alert-info">

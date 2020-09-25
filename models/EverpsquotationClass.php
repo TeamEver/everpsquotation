@@ -166,8 +166,9 @@ class EverpsquotationClass extends ObjectModel
 
     public static function evercopycart($id_cart)
     {
+        $isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $copyCart = Db::getInstance()->Execute(
-            'INSERT INTO `'._DB_PREFIX_.'everpsquotation_cart` 
+            'INSERT INTO `'._DB_PREFIX_.'everpsquotation_cart`
             (
                 id_shop_group,
                 id_shop,
@@ -185,7 +186,7 @@ class EverpsquotationClass extends ObjectModel
                 date_add,
                 date_upd
             )
-            SELECT 
+            SELECT
             id_shop_group,
             id_shop,
             id_carrier,
@@ -201,31 +202,52 @@ class EverpsquotationClass extends ObjectModel
             allow_seperated_package,
             date_add,
             date_upd
-            FROM `'._DB_PREFIX_.'cart` 
+            FROM `'._DB_PREFIX_.'cart`
             WHERE id_cart = '.$id_cart
         );
         if ($copyCart) {
             $quoteid = (int)Db::getInstance()->Insert_ID();
-            $copyCartProducts = Db::getInstance()->Execute(
-                'INSERT INTO `'._DB_PREFIX_.'everpsquotation_cart_product` 
-                (
-                    id_everpsquotation_cart,
-                    id_product,
-                    id_address_delivery,
-                    id_shop,
-                    id_product_attribute,
-                    id_customization
-                )
-                SELECT 
-                    '.$quoteid.',
-                    id_product,
-                    id_address_delivery,
-                    id_shop,
-                    id_product_attribute,
-                    id_customization
-                FROM `'._DB_PREFIX_.'cart_product` 
-                WHERE id_cart = '.$id_cart
-            );
+            if ((bool)$isSeven === true) {
+                $copyCartProducts = Db::getInstance()->Execute(
+                    'INSERT INTO `'._DB_PREFIX_.'everpsquotation_cart_product`
+                    (
+                        id_everpsquotation_cart,
+                        id_product,
+                        id_address_delivery,
+                        id_shop,
+                        id_product_attribute,
+                        id_customization
+                    )
+                    SELECT
+                        '.(int)$quoteid.',
+                        id_product,
+                        id_address_delivery,
+                        id_shop,
+                        id_product_attribute,
+                        id_customization
+                    FROM `'._DB_PREFIX_.'cart_product`
+                    WHERE id_cart = '.(int)$id_cart
+                );
+            } else {
+                $copyCartProducts = Db::getInstance()->Execute(
+                    'INSERT INTO `'._DB_PREFIX_.'everpsquotation_cart_product`
+                    (
+                        id_everpsquotation_cart,
+                        id_product,
+                        id_address_delivery,
+                        id_shop,
+                        id_product_attribute
+                    )
+                    SELECT
+                        '.(int)$quoteid.',
+                        id_product,
+                        id_address_delivery,
+                        id_shop,
+                        id_product_attribute
+                    FROM `'._DB_PREFIX_.'cart_product`
+                    WHERE id_cart = '.(int)$id_cart
+                );
+            }
             if ($copyCartProducts) {
                 return true;
             }
@@ -235,7 +257,7 @@ class EverpsquotationClass extends ObjectModel
     public static function erase($id_everpsquotation_quotes)
     {
         $everquote_obj = new EverpsquotationClass($id_everpsquotation_quotes);
-        
+
         return $everquote_obj->delete()
                 && Db::getInstance()->delete(
                     'everpsquotation_quote_detail',

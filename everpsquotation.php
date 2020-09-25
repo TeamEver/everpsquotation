@@ -30,7 +30,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.19';
+        $this->version = '2.2.20';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -40,6 +40,7 @@ class Everpsquotation extends PaymentModule
         $this->displayName = $this->l('Ever PS Quotation');
         $this->description = $this->l('Simply accept quotations on your Prestashop !');
         $this->confirmUninstall = $this->l('Do you REALLY want to uninstall this awesome module ?');
+        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
@@ -58,7 +59,11 @@ class Everpsquotation extends PaymentModule
                 return false;
             }
         }
-
+        if ($this->isSeven) {
+            $paymenthook = 'paymentOptions';
+        } else {
+            $paymenthook = 'payment';
+        }
         return (parent::install()
             && $this->registerHook('header')
             && $this->registerHook('displayCustomerAccount')
@@ -66,7 +71,7 @@ class Everpsquotation extends PaymentModule
             && $this->registerHook('LeftColumn')
             && $this->registerHook('RightColumn')
             && $this->registerHook('displayReassurance')
-            && $this->registerHook('paymentOptions')
+            && $this->registerHook($paymenthook)
             && $this->installModuleTab('AdminEverPsQuotation'));
     }
 
@@ -772,7 +777,11 @@ class Everpsquotation extends PaymentModule
 
     public function hookDisplayCustomerAccount()
     {
-        return $this->display(__FILE__, 'views/templates/front/myaccount.tpl');
+        if ($this->isSeven) {
+            return $this->display(__FILE__, 'views/templates/front/myaccount.tpl');
+        } else {
+            return $this->display(__FILE__, 'views/templates/front/myaccount16.tpl');
+        }
     }
 
     public function createEverQuoteCart($id_cart)

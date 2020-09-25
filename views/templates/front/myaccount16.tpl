@@ -7,7 +7,7 @@
 *}
 <li>
     <a href="{$link->getModuleLink('everpsquotation','quotations')|escape:'htmlall':'UTF-8'}">
-        <i class="icon-file-o"></i>
+        <i class="icon-file-o fa fa-list-ol"></i>
         <span class="link-item">
             {l s='My quotations' mod='everpsquotation'}
         </span>

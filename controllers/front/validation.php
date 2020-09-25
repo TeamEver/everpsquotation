@@ -173,7 +173,7 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             ));
             $this->setTemplate('module:everpsquotation/views/templates/front/quotation_added.tpl');
         } else {
-            die($this->l('Sending email error.'));
+            die('Sending email error.');
         }
     }
 }
