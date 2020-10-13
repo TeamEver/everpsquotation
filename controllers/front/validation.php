@@ -137,9 +137,7 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
         $attachment['content'] = $pdf->render(false);
         $attachment['name'] = $ever_filename;
         $attachment['mime'] = 'application/pdf';
-
-        //Send customer email
-        if (Mail::send(
+        Mail::send(
             (int)$this->context->language->id,
             'everquotecustomer',
             (string)$subject,
@@ -166,14 +164,11 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             (string)$everShopEmail,
             (string)$everShopEmail,
             Configuration::get('PS_SHOP_NAME')
-        )) {
-            $this->context->smarty->assign(array(
-                'shop_phone' => Configuration::get('PS_SHOP_PHONE', null, null, (int)$id_shop),
-                'shop_email' => Configuration::get('PS_SHOP_EMAIL', null, null, (int)$id_shop),
-            ));
-            $this->setTemplate('module:everpsquotation/views/templates/front/quotation_added.tpl');
-        } else {
-            die('Sending email error.');
-        }
+        );
+        $this->context->smarty->assign(array(
+            'shop_phone' => Configuration::get('PS_SHOP_PHONE', null, null, (int)$id_shop),
+            'shop_email' => Configuration::get('PS_SHOP_EMAIL', null, null, (int)$id_shop),
+        ));
+        $this->setTemplate('module:everpsquotation/views/templates/front/quotation_added.tpl');
     }
 }
