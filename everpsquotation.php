@@ -30,7 +30,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.2.21';
+        $this->version = '2.3.1';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -174,6 +174,9 @@ class Everpsquotation extends PaymentModule
             'rewrite_mode' => $rewriteMode,
         ));
 
+        if ($this->checkLatestEverModuleVersion($this->name, $this->version)) {
+            $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/upgrade.tpl');
+        }
         $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/header.tpl');
         $this->html .= $this->renderForm();
         $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/footer.tpl');
@@ -260,6 +263,14 @@ class Everpsquotation extends PaymentModule
                             'id' => 'id_group',
                             'name' => 'name',
                         ),
+                    ),
+                    array(
+                        'col' => 3,
+                        'type' => 'text',
+                        'desc' => $this->l('Minimum amount without taxes to allow quotations'),
+                        'name' => 'EVERPSQUOTATION_MIN_AMOUNT',
+                        'label' => $this->l('Quotation minimum amount'),
+                        'hint' => 'Leave empty for no use',
                     ),
                     array(
                         'type' => 'switch',
@@ -357,6 +368,11 @@ class Everpsquotation extends PaymentModule
             ) {
                 $this->postErrors[] = $this->l('Error: allowed groups is not valid');
             }
+            if (Tools::getValue('EVERPSQUOTATION_MIN_AMOUNT')
+                && !Validate::isPrice(Tools::getValue('EVERPSQUOTATION_MIN_AMOUNT'))
+            ) {
+                $this->postErrors[] = $this->l('Error: minimum amount is not valid');
+            }
             if (Tools::getValue('EVERPSQUOTATION_PRODUCT')
                 && !Validate::isBool(Tools::getValue('EVERPSQUOTATION_PRODUCT'))
             ) {
@@ -431,6 +447,11 @@ class Everpsquotation extends PaymentModule
             'EVERPSQUOTATION_GROUPS',
             Tools::jsonEncode(Tools::getValue('EVERPSQUOTATION_GROUPS')),
             true
+        );
+
+        Configuration::updateValue(
+            'EVERPSQUOTATION_MIN_AMOUNT',
+            Tools::getValue('EVERPSQUOTATION_MIN_AMOUNT')
         );
 
         Configuration::updateValue(
@@ -513,6 +534,13 @@ class Everpsquotation extends PaymentModule
                     )
                 )
             ),
+            'EVERPSQUOTATION_MIN_AMOUNT' => Tools::getValue(
+                'EVERPSQUOTATION_MIN_AMOUNT',
+                Configuration::get(
+                    'EVERPSQUOTATION_MIN_AMOUNT',
+                    (int)$this->context->language->id
+                )
+            ),
             'EVERPSQUOTATION_PRODUCT' => Tools::getValue(
                 'EVERPSQUOTATION_PRODUCT',
                 Configuration::get(
@@ -560,6 +588,17 @@ class Everpsquotation extends PaymentModule
         }
 
         $cart = $this->context->cart;
+        $total_cart = $this->context->cart->getOrderTotal(
+            false,
+            Cart::BOTH_WITHOUT_SHIPPING,
+            null,
+            null,
+            true
+        );
+        if ((float)Configuration::get('EVERPSQUOTATION_MIN_AMOUNT') > 0
+            && $total_cart < Configuration::get('EVERPSQUOTATION_MIN_AMOUNT')) {
+            return;
+        }
         $cartproducts = $cart->getProducts();
         $customerGroups = Customer::getGroupsStatic((int)$cart->id_customer);
         $selected_cat = $this->getAllowedCategories();
@@ -594,6 +633,17 @@ class Everpsquotation extends PaymentModule
         }
 
         $cart = $this->context->cart;
+        $total_cart = $this->context->cart->getOrderTotal(
+            false,
+            Cart::BOTH_WITHOUT_SHIPPING,
+            null,
+            null,
+            true
+        );
+        if ((float)Configuration::get('EVERPSQUOTATION_MIN_AMOUNT') > 0
+            && $total_cart < Configuration::get('EVERPSQUOTATION_MIN_AMOUNT')) {
+            return;
+        }
         $cartproducts = $cart->getProducts();
         $customerGroups = Customer::getGroupsStatic((int)$cart->id_customer);
         $selected_cat = $this->getAllowedCategories();
@@ -660,6 +710,17 @@ class Everpsquotation extends PaymentModule
 
     public function hookDisplayShoppingCart()
     {
+        $total_cart = $this->context->cart->getOrderTotal(
+            false,
+            Cart::BOTH_WITHOUT_SHIPPING,
+            null,
+            null,
+            true
+        );
+        if ((float)Configuration::get('EVERPSQUOTATION_MIN_AMOUNT') > 0
+            && $total_cart < Configuration::get('EVERPSQUOTATION_MIN_AMOUNT')) {
+            return;
+        }
         $validationUrl = Context::getContext()->link->getModuleLink(
             $this->name,
             'validation',
@@ -716,6 +777,17 @@ class Everpsquotation extends PaymentModule
 
     public function hookDisplayReassurance()
     {
+        $total_cart = $this->context->cart->getOrderTotal(
+            false,
+            Cart::BOTH_WITHOUT_SHIPPING,
+            null,
+            null,
+            true
+        );
+        if ((float)Configuration::get('EVERPSQUOTATION_MIN_AMOUNT') > 0
+            && $total_cart < Configuration::get('EVERPSQUOTATION_MIN_AMOUNT')) {
+            return;
+        }
         $link = new Link();
         $selected_cat = $this->getAllowedCategories();
         $allowed_groups = $this->getAllowedGroups();
@@ -766,6 +838,11 @@ class Everpsquotation extends PaymentModule
     }
 
     public function hookDisplayProductExtraContent()
+    {
+        return $this->hookDisplayReassurance();
+    }
+
+    public function hookDisplayShoppingCartFooter()
     {
         return $this->hookDisplayReassurance();
     }
@@ -1037,5 +1114,29 @@ class Everpsquotation extends PaymentModule
             $allowed_groups = array($allowed_groups);
         }
         return $allowed_groups;
+    }
+
+    public function checkLatestEverModuleVersion($module, $version)
+    {
+        $upgrade_link = 'https://upgrade.team-ever.com/upgrade.php?module='
+        .$module
+        .'&version='
+        .$version;
+        $handle = curl_init($upgrade_link);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($handle);
+        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        if ($httpCode != 200) {
+            curl_close($handle);
+            return false;
+        }
+        curl_close($handle);
+        $module_version = Tools::file_get_contents(
+            $upgrade_link
+        );
+        if ($module_version && $module_version > $version) {
+            return true;
+        }
+        return false;
     }
 }

@@ -20,7 +20,7 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
     {
         $this->display_column_left = false;
         $this->display_column_right = false;
-
+        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         parent::init();
     }
 
@@ -39,6 +39,17 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
         $customer = new Customer((int)$cart->id_customer);
 
         if (!Validate::isLoadedObject($customer)) {
+            Tools::redirect('index.php?controller=order&step=1');
+        }
+        $total_cart = $cart->getOrderTotal(
+            false,
+            Cart::BOTH_WITHOUT_SHIPPING,
+            null,
+            null,
+            true
+        );
+        if ((float)Configuration::get('EVERPSQUOTATION_MIN_AMOUNT') > 0
+            && $total_cart < Configuration::get('EVERPSQUOTATION_MIN_AMOUNT')) {
             Tools::redirect('index.php?controller=order&step=1');
         }
 

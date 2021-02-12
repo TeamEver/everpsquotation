@@ -23,22 +23,14 @@ class AdminEverPsQuotationController extends ModuleAdminController
 
     protected $statuses_array = array();
 
-    protected function l($string, $class = null, $addslashes = false, $htmlentities = true)
-    {
-        if (_PS_VERSION_ >= '1.7') {
-            return Context::getContext()->getTranslator()->trans($string);
-        } else {
-            return parent::l($string, $class, $addslashes, $htmlentities);
-        }
-    }
-
     public function __construct()
     {
         $this->bootstrap = true;
         $this->table = 'everpsquotation_quotes';
         $this->className = 'EverpsquotationClass';
-        $this->identifier = "id_everpsquotation_quotes";
-
+        $this->identifier = 'id_everpsquotation_quotes';
+        $this->module_name = 'everpsquotation';
+        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         parent::__construct();
 
         $this->_select = '
@@ -134,8 +126,21 @@ class AdminEverPsQuotationController extends ModuleAdminController
         $this->shopShareDatas = Shop::SHARE_ORDER;
         $this->toolbar_title = $this->l('Quotations list');
         $this->context->smarty->assign(array(
-            'everpsquotation_dir' => _PS_BASE_URL_ . '/modules/everpsquotation/'
+            'everpsquotation_dir' => _PS_BASE_URL_ . '/modules/everpsquotation'
         ));
+    }
+
+    public function l($string, $class = null, $addslashes = false, $htmlentities = true)
+    {
+        if ($this->isSeven) {
+            return Context::getContext()->getTranslator()->trans(
+                $string,
+                [],
+                'Modules.Everpsquotation.Admineverpsquotationcontroller'
+            );
+        }
+
+        return parent::l($string, $class, $addslashes, $htmlentities);
     }
 
     public function initToolbar()
@@ -158,7 +163,16 @@ class AdminEverPsQuotationController extends ModuleAdminController
         $this->addRowAction('delete');
         $this->addRowAction('validate');
         $lists = parent::renderList();
-        $html=$this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsquotation/views/templates/admin/header.tpl');
+        $html = $this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsquotation/views/templates/admin/header.tpl');
+        $module_instance = Module::getInstanceByName($this->module_name);
+        if ($module_instance->checkLatestEverModuleVersion($this->module_name, $module_instance->version)) {
+            $html .= $this->context->smarty->fetch(
+                _PS_MODULE_DIR_
+                .'/'
+                .$this->module_name
+                .'/views/templates/admin/upgrade.tpl'
+            );
+        }
         $html .= $lists;
         $html .= $this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsquotation/views/templates/admin/footer.tpl');
 
