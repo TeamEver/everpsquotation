@@ -2,7 +2,7 @@
 * Project : Everpsquotation
 * @author Team EVER
 * @copyright Team EVER
-* @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
+* @license Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
 * @link https://www.team-ever.com
 *}
 
@@ -18,14 +18,22 @@
 {assign var=table_padding value="4px"}
 
 <style>
-	table, th, td {
-		margin: 0!important;
-		padding: 0!important;
+	table,
+	th,
+	td {
+		margin: 0 !important;
+		padding: 0 !important;
 		vertical-align: middle;
-		font-size: {$font_size_text|escape:'htmlall':'UTF-8'};
-		white-space: nowrap;
+
+		font-size: {
+			$font_size_text|escape: 'htmlall':'UTF-8'
+		}
+
+		;
+		white-space : nowrap;
 	}
-    .spacer {
-        min-height:15px;
-    }
+
+	.spacer {
+		min-height: 15px;
+	}
 </style>
