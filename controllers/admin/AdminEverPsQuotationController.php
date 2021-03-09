@@ -188,17 +188,9 @@ class AdminEverPsQuotationController extends ModuleAdminController
             $pdf->render();
         }
         if (Tools::isSubmit('validateeverpsquotation_quotes')) {
-            require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationClass.php';
             $validation = new EverpsquotationClass(Tools::getValue('id_everpsquotation_quotes'));
             $validation->valid = 1;
             if (!$validation->update()) {
-                    $this->errors[] = Tools::displayError('An error has occurred: Can\'t update the current object');
-            }
-        }
-        if (Tools::isSubmit('deleteeverpsquotation_quotes')) {
-            require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationClass.php';
-            $quote = new EverpsquotationClass(Tools::getValue('id_everpsquotation_quotes'));
-            if (!$quote->delete()) {
                     $this->errors[] = Tools::displayError('An error has occurred: Can\'t update the current object');
             }
         }
