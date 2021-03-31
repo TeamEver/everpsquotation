@@ -1,10 +1,20 @@
 <?php
 /**
- * Project : everpsquotation
- * @author Team Ever
- * @copyright Team Ever
- * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
- * @link http://team-ever.com
+ * 2019-2021 Team Ever
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ *  @author    Team Ever <https://www.team-ever.com/>
+ *  @copyright 2019-2021 Team Ever
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -30,7 +40,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.3.2';
+        $this->version = '2.3.3';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -71,7 +81,7 @@ class Everpsquotation extends PaymentModule
             && $this->registerHook('LeftColumn')
             && $this->registerHook('RightColumn')
             && $this->registerHook('displayReassurance')
-            && $this->registerHook($paymenthook)
+            // && $this->registerHook($paymenthook)
             && $this->installModuleTab('AdminEverPsQuotation'));
     }
 
