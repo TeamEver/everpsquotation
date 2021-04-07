@@ -40,7 +40,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.3.3';
+        $this->version = '2.3.4';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -92,12 +92,14 @@ class Everpsquotation extends PaymentModule
      */
     public function uninstall()
     {
-        // Uninstall SQL
-        $sql = array();
-        include(dirname(__FILE__).'/sql/uninstall.php');
-        foreach ($sql as $s) {
-            if (!Db::getInstance()->execute($s)) {
-                return false;
+        if ((bool)Configuration::get('EVERPSQUOTATION_DROP_SQL') === true) {
+            // Uninstall SQL
+            $sql = array();
+            include(dirname(__FILE__).'/sql/uninstall.php');
+            foreach ($sql as $s) {
+                if (!Db::getInstance()->execute($s)) {
+                    return false;
+                }
             }
         }
 
@@ -250,6 +252,26 @@ class Everpsquotation extends PaymentModule
                 ),
                 'input' => array(
                     array(
+                        'type' => 'switch',
+                        'label' => $this->l('Drop all quotations on module uninstall ?'),
+                        'name' => 'EVERPSQUOTATION_DROP_SQL',
+                        'is_bool' => true,
+                        'desc' => $this->l('Will delete all quotations on module uninstall'),
+                        'hint' => 'Else all quotations will be keeped on module uninstall',
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => true,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => false,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
                         'type' => 'categories',
                         'name' => 'EVERPSQUOTATION_CATEGORIES',
                         'label' => $this->l('Category'),
@@ -358,6 +380,12 @@ class Everpsquotation extends PaymentModule
     private function postValidation()
     {
         if (Tools::isSubmit('submitEverpsquotationModule')) {
+            if (Tools::getValue('EVERPSQUOTATION_DROP_SQL')
+                && !Validate::isBool(Tools::getValue('EVERPSQUOTATION_DROP_SQL'))
+            ) {
+                $this->postErrors[] = $this->l('Error: drop quotations on uninstall is not valid');
+            }
+
             if (!Tools::getIsset('EVERPSQUOTATION_ACCOUNT_EMAIL')
                 || !Validate::isEmail(Tools::getValue('EVERPSQUOTATION_ACCOUNT_EMAIL'))
             ) {
@@ -446,6 +474,10 @@ class Everpsquotation extends PaymentModule
                 .$lang['id_lang']
             ) : '';
         }
+        Configuration::updateValue(
+            'EVERPSQUOTATION_DROP_SQL',
+            Tools::getValue('EVERPSQUOTATION_DROP_SQL')
+        );
 
         Configuration::updateValue(
             'EVERPSQUOTATION_CATEGORIES',
