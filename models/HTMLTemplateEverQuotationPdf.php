@@ -67,26 +67,13 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
                 );
             }
         }
-        // die(var_dump($customizations));
         $total_taxes = $everpsquotation->total_paid_tax_incl - $everpsquotation->total_paid_tax_excl;
 
         $this->smarty->assign(array(
             '_PS_VERSION_' => _PS_VERSION_,
             'details' => $details,
             'customizations' => $customizations,
-            'total_discounts' => $everpsquotation->total_discounts,
-            'total_discounts_tax_incl' => $everpsquotation->total_discounts_tax_incl,
-            'total_discounts_tax_excl' => $everpsquotation->total_discounts_tax_excl,
-            'total_paid_tax_incl' => $everpsquotation->total_paid_tax_incl,
-            'total_paid_tax_excl' => $everpsquotation->total_paid_tax_excl,
-            'total_products' => $everpsquotation->total_products,
-            'total_products_wt' => $everpsquotation->total_products_wt,
-            'total_shipping' => $everpsquotation->total_shipping,
-            'total_shipping_tax_incl' => $everpsquotation->total_shipping_tax_incl,
-            'total_shipping_tax_excl' => $everpsquotation->total_shipping_tax_excl,
-            'total_wrapping' => $everpsquotation->total_wrapping,
-            'total_wrapping_tax_incl' => $everpsquotation->total_wrapping_tax_incl,
-            'total_wrapping_tax_excl' => $everpsquotation->total_wrapping_tax_excl,
+            'everpsquotation' => $everpsquotation,
             'total_taxes' => $total_taxes,
             'date_add' => $everpsquotation->date_add,
         ));

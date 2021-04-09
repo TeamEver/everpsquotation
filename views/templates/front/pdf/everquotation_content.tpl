@@ -1,9 +1,19 @@
 {*
-* Project : Everpsquotation
-* @author Team EVER
-* @copyright Team EVER
-* @license Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
-* @link https://www.team-ever.com
+ * 2019-2021 Team Ever
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ *  @author    Team Ever <https://www.team-ever.com/>
+ *  @copyright 2019-2021 Team Ever
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <table id="spacer" cellspacing="0" cellpadding="0">
     <tr>
@@ -26,9 +36,6 @@
                 </tr>
                 <tr>
                     <td>{$customerInfos->email|escape:'htmlall':'UTF-8'}</td>
-                </tr>
-                <tr>
-                    <td>{$customerAddress->phone|escape:'htmlall':'UTF-8'}</td>
                 </tr>
                 <tr>
                     <td>{$customerAddress->address1|escape:'htmlall':'UTF-8'}</td>
@@ -70,9 +77,6 @@
                 </tr>
                 <tr>
                     <td>{$customerInfos->email|escape:'htmlall':'UTF-8'}</td>
-                </tr>
-                <tr>
-                    <td>{$customerAddressDelivery->phone|escape:'htmlall':'UTF-8'}</td>
                 </tr>
                 <tr>
                     <td>{$customerAddressDelivery->address1|escape:'htmlall':'UTF-8'}</td>
@@ -143,10 +147,9 @@
 </table>
 {if $details}
 <!-- Products list -->
-<table width="100%" id="content" border="0" cellpadding="2" cellspacing="0"
-    style="margin:0;border:0.5px solid #414040;">
-    <thead style="border-bottom:0.5px solid #414040;">
-        <tr style="color:white; background-color: #414040;border-bottom:0.5px solid #414040;">
+<table width="100%" id="content" border="0" cellpadding="2" cellspacing="0" style="margin:0;border:1px solid #808080;">
+    <thead style="border-bottom:1px solid #808080;">
+        <tr style="color:#000; background-color: #DCDCDC;border-bottom:1px solid #808080;">
             <th class="header small" align="left">{l s='Product reference' mod='everpsquotation'}</th>
             <th class="header small" align="left">{l s='Product name' mod='everpsquotation'}</th>
             <th class="header small" align="right">{l s='Product quantity' mod='everpsquotation'}</th>
@@ -195,43 +198,61 @@
 </table>
 <!-- //Products list -->
 <!-- Table total -->
-<table width="100%" id="content" border="0" cellpadding="2" cellspacing="0" style="margin:0;">
+<table width="100%" id="content" border="0" cellpadding="2" cellspacing="0" style="0;">
     <tbody>
         <tr>
             <td colspan="3"></td>
-            <td align="right" style="margin:0;border-top:0.5px solid #414040; background-color: #414040;color:white">
+            <td align="right" style="margin:0;border-top:1px solid #808080; background-color: #DCDCDC;">
                 {l s='Total products wt' mod='everpsquotation'}
             </td>
-            <td align="right" style="border-top:0.5px solid #414040; border-right:0.5px solid #414040;">
-                {convertPrice price=$total_products}
+            <td align="right" style="border-top:1px solid #808080;">
+                {convertPrice price=$everpsquotation->total_products}
             </td>
         </tr>
         <tr>
             <td colspan="3"></td>
-            <td align="right" style="margin:0; background-color: #414040;color:white">
+            <td align="right" style="margin:0; background-color: #DCDCDC;">
                 {l s='Total carrier wt' mod='everpsquotation'}
             </td>
-            <td align="right" style=" border-right:0.5px solid #414040;">
-                {convertPrice price=$total_shipping}
+            <td align="right" style="">
+                {convertPrice price=$everpsquotation->total_shipping}
             </td>
         </tr>
         <tr>
             <td colspan="3"></td>
-            <td align="right" style="margin:0; background-color: #414040;color:white">
+            <td align="right" style="margin:0; background-color: #DCDCDC;">
+                {l s='Total discount wt' mod='everpsquotation'}
+            </td>
+            <td align="right" style="">
+                {convertPrice price=$everpsquotation->total_discounts_tax_excl}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3"></td>
+            <td align="right" style="margin:0; background-color: #DCDCDC;">
+                {l s='Total wt' mod='everpsquotation'}
+            </td>
+            <td align="right" style="">
+                {convertPrice price=$everpsquotation->total_paid_tax_excl}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3"></td>
+            <td align="right" style="margin:0; background-color: #DCDCDC;">
                 {l s='Total taxes' mod='everpsquotation'}
             </td>
-            <td align="right" style=" border-right:0.5px solid #414040;">
+            <td align="right" style="">
                 {convertPrice price=$total_taxes}
             </td>
         </tr>
+
         <tr>
             <td colspan="3"></td>
-            <td align="right"
-                style="margin:0; border-bottom:0.5px solid #414040; background-color: #414040;color:white">
+            <td align="right" style="margin:0; border-bottom:1px solid #808080; background-color: #DCDCDC;">
                 {l s='Total tax incl.' mod='everpsquotation'}
             </td>
-            <td align="right" style="border-bottom:0.5px solid #414040; border-right:0.5px solid #414040;">
-                {convertPrice price=$total_paid_tax_incl}
+            <td align="right" style="border-bottom:1px solid #808080;">
+                {convertPrice price=$everpsquotation->total_paid_tax_incl}
             </td>
         </tr>
     </tbody>
