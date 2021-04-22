@@ -30,7 +30,7 @@ class EverpsquotationQuotationsModuleFrontController extends ModuleFrontControll
     {
         $this->display_column_left = false;
         $this->display_column_right = false;
-
+        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         parent::init();
     }
 
@@ -119,6 +119,19 @@ class EverpsquotationQuotationsModuleFrontController extends ModuleFrontControll
         }
     }
 
+    public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
+    {
+        if ($this->isSeven) {
+            return Context::getContext()->getTranslator()->trans(
+                $string,
+                [],
+                'Modules.Everpsquotation.quotations'
+            );
+        }
+
+        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
+    }
+
     public function getBreadcrumbLinks()
     {
         $breadcrumb = parent::getBreadcrumbLinks();
@@ -127,7 +140,7 @@ class EverpsquotationQuotationsModuleFrontController extends ModuleFrontControll
             'title' => $this->l('My quotations'),
             'url' => $this->context->link->getModuleLink(
                 'everpsquotation',
-                'quotations'
+                $this->l('quotations')
             ),
         );
         return $breadcrumb;
