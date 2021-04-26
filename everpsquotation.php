@@ -40,7 +40,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.3.5';
+        $this->version = '2.3.6';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -994,6 +994,7 @@ class Everpsquotation extends PaymentModule
         foreach ($cartproducts as $quoteProduct) {
             $product = new Product(
                 (int)$quoteProduct['id_product'],
+                false,
                 (int)$this->context->language->id,
                 (int)$this->context->shop->id
             );
@@ -1038,17 +1039,18 @@ class Everpsquotation extends PaymentModule
         $quote->date_add = $cart->date_add;
         $quote->date_upd = $cart->date_upd;
         $quote->save();
-        $quoteid = (int)Db::getInstance()->Insert_ID();
 
         //Now create new Everpsquotationdetail object
         foreach ($cartproducts as $cartproduct) {
             $product = new Product(
                 (int)$cartproduct['id_product'],
+                false,
                 (int)$this->context->language->id,
                 (int)$this->context->shop->id
             );
+
             $quotedetail = new EverpsquotationDetail();
-            $quotedetail->id_everpsquotation_quotes = (int)$quoteid;
+            $quotedetail->id_everpsquotation_quotes = (int)$quote->id;
             $quotedetail->id_shop = (int)$cartproduct['id_shop'];
             $quotedetail->product_id = (int)$product->id;
             $quotedetail->product_attribute_id = (int)$cartproduct['id_product_attribute'];
@@ -1087,7 +1089,7 @@ class Everpsquotation extends PaymentModule
 
         $id_shop = (int)Context::getContext()->shop->id;
         $mailDir = _PS_MODULE_DIR_.'everpsquotation/mails/';
-        $mailpdf = new PDF($quoteid, 'EverQuotationPdf', Context::getContext()->smarty);
+        $mailpdf = new PDF($quote->id, 'EverQuotationPdf', Context::getContext()->smarty);
         $customer = new Customer(
             (int)Context::getContext()->customer->id
         );
