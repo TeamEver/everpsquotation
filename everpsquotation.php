@@ -40,7 +40,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.3.6';
+        $this->version = '2.3.7';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -1129,7 +1129,7 @@ class Everpsquotation extends PaymentModule
             Configuration::get('PS_SHOP_NAME')
         );
         // Render PDF for direct download
-        $pdf = new PDF($quoteid, 'EverQuotationPdf', Context::getContext()->smarty);
+        $pdf = new PDF($quote->id, 'EverQuotationPdf', Context::getContext()->smarty);
         $pdf->render();
     }
 
