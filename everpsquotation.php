@@ -40,7 +40,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.3.7';
+        $this->version = '2.3.8';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -61,6 +61,10 @@ class Everpsquotation extends PaymentModule
      */
     public function install()
     {
+        Configuration::updateValue(
+            'EVERPSQUOTATION_LOGO_WIDTH',
+            180
+        );
         // Install SQL
         $sql = array();
         include(dirname(__FILE__).'/sql/install.php');
@@ -105,6 +109,7 @@ class Everpsquotation extends PaymentModule
 
         return (parent::uninstall()
             && Configuration::deleteByName('EVERPSQUOTATION_ACCOUNT_EMAIL')
+            && Configuration::deleteByName('EVERPSQUOTATION_LOGO_WIDTH')
             && Configuration::deleteByName('EVERPSQUOTATION_PREFIX')
             && Configuration::deleteByName('EVERPSQUOTATION_TEXT')
             && Configuration::deleteByName('EVERPSQUOTATION_MAIL_SUBJECT')
@@ -327,6 +332,15 @@ class Everpsquotation extends PaymentModule
                     array(
                         'col' => 3,
                         'type' => 'text',
+                        'desc' => $this->l('Logo width (pixel value) on quotes'),
+                        'name' => 'EVERPSQUOTATION_LOGO_WIDTH',
+                        'label' => $this->l('Logo width'),
+                        'hint' => 'Will define your logo width on quotes',
+                        'required' => true,
+                    ),
+                    array(
+                        'col' => 3,
+                        'type' => 'text',
                         'prefix' => '<i class="icon icon-envelope"></i>',
                         'desc' => $this->l('Admin email for quotation mails copy'),
                         'name' => 'EVERPSQUOTATION_ACCOUNT_EMAIL',
@@ -384,6 +398,12 @@ class Everpsquotation extends PaymentModule
                 && !Validate::isBool(Tools::getValue('EVERPSQUOTATION_DROP_SQL'))
             ) {
                 $this->postErrors[] = $this->l('Error: drop quotations on uninstall is not valid');
+            }
+
+            if (!Tools::getValue('EVERPSQUOTATION_LOGO_WIDTH')
+                || !Validate::isInt(Tools::getValue('EVERPSQUOTATION_LOGO_WIDTH'))
+            ) {
+                $this->postErrors[] = $this->l('Error: logo width is not valid');
             }
 
             if (!Tools::getIsset('EVERPSQUOTATION_ACCOUNT_EMAIL')
@@ -474,9 +494,13 @@ class Everpsquotation extends PaymentModule
                 .$lang['id_lang']
             ) : '';
         }
-        Configuration::updateValue(
+         Configuration::updateValue(
             'EVERPSQUOTATION_DROP_SQL',
             Tools::getValue('EVERPSQUOTATION_DROP_SQL')
+        );
+        Configuration::updateValue(
+            'EVERPSQUOTATION_LOGO_WIDTH',
+            Tools::getValue('EVERPSQUOTATION_LOGO_WIDTH')
         );
 
         Configuration::updateValue(
@@ -588,6 +612,18 @@ class Everpsquotation extends PaymentModule
                 Configuration::get(
                     'EVERPSQUOTATION_PRODUCT',
                     (int)$this->context->language->id
+                )
+            ),
+            'EVERPSQUOTATION_DROP_SQL' => Tools::getValue(
+                'EVERPSQUOTATION_DROP_SQL',
+                Configuration::get(
+                    'EVERPSQUOTATION_DROP_SQL'
+                )
+            ),
+            'EVERPSQUOTATION_LOGO_WIDTH' => Tools::getValue(
+                'EVERPSQUOTATION_LOGO_WIDTH',
+                Configuration::get(
+                    'EVERPSQUOTATION_LOGO_WIDTH'
                 )
             ),
             'EVERPSQUOTATION_ACCOUNT_EMAIL' => Tools::getValue(

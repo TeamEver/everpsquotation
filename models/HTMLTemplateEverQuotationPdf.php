@@ -1,24 +1,15 @@
 <?php
+
 /**
- * 2019-2021 Team Ever
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
- *
- *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2021 Team Ever
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * Project : everpsquotation
+ * @author Team Ever
+ * @copyright Team Ever
+ * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
+ * @link http://team-ever.com
  */
 
-require_once _PS_MODULE_DIR_.'everpsquotation/models/EverpsquotationClass.php';
-require_once _PS_MODULE_DIR_.'everpsquotation/models/EverpsquotationDetail.php';
+require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationClass.php';
+require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationDetail.php';
 
 class HTMLTemplateEverQuotationPdf extends HTMLTemplate
 {
@@ -28,7 +19,7 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
     {
         $this->id_everpsquotation_quotes = $id_everpsquotation_quotes;
         $this->smarty = $smarty;
-        $this->pdfDir = _PS_MODULE_DIR_.'everpsquotation/views/templates/front/pdf/';
+        $this->pdfDir = _PS_MODULE_DIR_ . 'everpsquotation/views/templates/front/pdf/';
         $this->context = Context::getContext();
         $this->shop = new Shop(Context::getContext()->shop->id);
         $this->lang = new Language((int)Context::getContext()->language->id);
@@ -47,10 +38,15 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
         $everpsquotation = new EverpsquotationClass(
             (int)$this->id_everpsquotation_quotes
         );
+        $everpsquotation->date_add = date(
+            'd/m/Y',
+            strtotime($everpsquotation->date_add)
+        );
         $details = EverpsquotationDetail::getQuoteDetailByQuoteId(
             $this->id_everpsquotation_quotes,
             Context::getContext()->shop->id,
             Context::getContext()->language->id
+
         );
         $cart = new Cart(
             (int)$everpsquotation->id_cart
@@ -67,18 +63,31 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
                 );
             }
         }
+        // die(var_dump($customizations));
         $total_taxes = $everpsquotation->total_paid_tax_incl - $everpsquotation->total_paid_tax_excl;
 
         $this->smarty->assign(array(
             '_PS_VERSION_' => _PS_VERSION_,
             'details' => $details,
             'customizations' => $customizations,
-            'everpsquotation' => $everpsquotation,
+            'total_discounts' => $everpsquotation->total_discounts,
+            'total_discounts_tax_incl' => $everpsquotation->total_discounts_tax_incl,
+            'total_discounts_tax_excl' => $everpsquotation->total_discounts_tax_excl,
+            'total_paid_tax_incl' => $everpsquotation->total_paid_tax_incl,
+            'total_paid_tax_excl' => $everpsquotation->total_paid_tax_excl,
+            'total_products' => $everpsquotation->total_products,
+            'total_products_wt' => $everpsquotation->total_products_wt,
+            'total_shipping' => $everpsquotation->total_shipping,
+            'total_shipping_tax_incl' => $everpsquotation->total_shipping_tax_incl,
+            'total_shipping_tax_excl' => $everpsquotation->total_shipping_tax_excl,
+            'total_wrapping' => $everpsquotation->total_wrapping,
+            'total_wrapping_tax_incl' => $everpsquotation->total_wrapping_tax_incl,
+            'total_wrapping_tax_excl' => $everpsquotation->total_wrapping_tax_excl,
             'total_taxes' => $total_taxes,
             'date_add' => $everpsquotation->date_add,
         ));
 
-        return $this->smarty->fetch($this->pdfDir.'/everquotation_content.tpl');
+        return $this->smarty->fetch($this->pdfDir . '/everquotation_content.tpl');
     }
 
     public function getHeader()
@@ -89,20 +98,15 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
         $customerAddressDelivery = new Address($everpsquotation->id_address_delivery);
         $id_shop = (int)Context::getContext()->shop->id;
         $shop_address = $this->getShopAddress();
-        $path_logo = $this->getLogo();
-        $width = 0;
-        $height = 0;
-        if (!empty($path_logo)) {
-            list($width, $height) = getimagesize(_PS_IMG_DIR_.$path_logo);
-        }
-
-        //Limit the height of the logo for the PDF render
-        $maximum_height = 100;
-        if ($height > $maximum_height) {
-            $ratio = $maximum_height / $height;
-            $height *= $ratio;
-            $width *= $ratio;
-        }
+        
+        $path_logo = _PS_IMG_ . Configuration::get(
+            'PS_LOGO_INVOICE',
+            null,
+            null,
+            (int)Context::getContext()->shop->id
+        );
+        $width = (int)Configuration::get('EVERPSQUOTATION_LOGO_WIDTH');
+      
 
         $this->smarty->assign(array(
             'id_everpsquotation_quotes' => $this->id_everpsquotation_quotes,
@@ -115,12 +119,11 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
             'shop_address' => $shop_address,
             'logo_path' => $path_logo,
             'width_logo' => $width,
-            'height_logo' => $height,
             'shop_phone' => Configuration::get('PS_SHOP_PHONE', null, null, (int)$id_shop),
             'shop_email' => Configuration::get('PS_SHOP_EMAIL', null, null, (int)$id_shop),
         ));
 
-        return $this->smarty->fetch($this->pdfDir.'/everquotation_header.tpl');
+        return $this->smarty->fetch($this->pdfDir . '/everquotation_header.tpl');
     }
 
     /**
@@ -133,7 +136,7 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
             'id_everpsquotation_quotes' => $this->id_everpsquotation_quotes,
             'everpsquotationtext' => $this->text,
         ));
-        return $this->smarty->fetch($this->pdfDir.'/everquotation_footer.tpl');
+        return $this->smarty->fetch($this->pdfDir . '/everquotation_footer.tpl');
     }
 
     /**
@@ -142,7 +145,7 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
      */
     public function getFilename()
     {
-        return $this->filename.'.pdf';
+        return $this->filename . '.pdf';
     }
 
     /**
@@ -151,6 +154,6 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
      */
     public function getBulkFilename()
     {
-         return $this->filename.'.pdf';
+        return $this->filename . '.pdf';
     }
 }
