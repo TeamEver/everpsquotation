@@ -40,7 +40,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.3.8';
+        $this->version = '2.3.9';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -195,6 +195,7 @@ class Everpsquotation extends PaymentModule
             $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/upgrade.tpl');
         }
         $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/header.tpl');
+        $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
         $this->html .= $this->renderForm();
         $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/footer.tpl');
 
@@ -259,10 +260,10 @@ class Everpsquotation extends PaymentModule
                     array(
                         'type' => 'switch',
                         'label' => $this->l('Drop all quotations on module uninstall ?'),
+                        'desc' => $this->l('Will delete all quotations on module uninstall'),
+                        'hint' => $this->l('Else all quotations will be keeped on module uninstall'),
                         'name' => 'EVERPSQUOTATION_DROP_SQL',
                         'is_bool' => true,
-                        'desc' => $this->l('Will delete all quotations on module uninstall'),
-                        'hint' => 'Else all quotations will be keeped on module uninstall',
                         'values' => array(
                             array(
                                 'id' => 'active_on',
@@ -280,14 +281,16 @@ class Everpsquotation extends PaymentModule
                         'type' => 'categories',
                         'name' => 'EVERPSQUOTATION_CATEGORIES',
                         'label' => $this->l('Category'),
+                        'desc' => $this->l('Allow only these categories on quotations'),
+                        'hint' => $this->l('Only products in selected categories will be allowed for quotes'),
                         'required' => true,
-                        'hint' => 'Only products in selected categories will be allowed for quotes',
                         'tree' => $tree,
                     ),
                     array(
                         'type' => 'select',
-                        'label' => 'Allowed customer groups',
-                        'hint' => 'Choose allowed groups, customers must be logged',
+                        'label' => $this->l('Allowed customer groups'),
+                        'desc' => $this->l('Choose allowed groups, customers must be logged'),
+                        'hint' => $this->l('Customers must be logged and have a registered address'),
                         'name' => 'EVERPSQUOTATION_GROUPS[]',
                         'class' => 'chosen',
                         'identifier' => 'name',
@@ -304,18 +307,18 @@ class Everpsquotation extends PaymentModule
                     array(
                         'col' => 3,
                         'type' => 'text',
-                        'desc' => $this->l('Minimum amount without taxes to allow quotations'),
-                        'name' => 'EVERPSQUOTATION_MIN_AMOUNT',
                         'label' => $this->l('Quotation minimum amount'),
-                        'hint' => 'Leave empty for no use',
+                        'desc' => $this->l('Minimum amount without taxes to allow quotations'),
+                        'hint' => $this->l('Leave empty for no use'),
+                        'name' => 'EVERPSQUOTATION_MIN_AMOUNT',
                     ),
                     array(
                         'type' => 'switch',
                         'label' => $this->l('Enable quotes creation on product pages'),
+                        'desc' => $this->l('Will show a "download quotation" on product page'),
+                        'hint' => $this->l('Will show a button next to "Add to cart".'),
                         'name' => 'EVERPSQUOTATION_PRODUCT',
                         'is_bool' => true,
-                        'desc' => $this->l('Will show a "download quotation" on product page'),
-                        'hint' => 'Will show a button next to "Add to cart".',
                         'values' => array(
                             array(
                                 'id' => 'active_on',
@@ -332,56 +335,57 @@ class Everpsquotation extends PaymentModule
                     array(
                         'col' => 3,
                         'type' => 'text',
-                        'desc' => $this->l('Logo width (pixel value) on quotes'),
-                        'name' => 'EVERPSQUOTATION_LOGO_WIDTH',
                         'label' => $this->l('Logo width'),
-                        'hint' => 'Will define your logo width on quotes',
+                        'desc' => $this->l('Logo width (pixel value) on quotes'),
+                        'hint' => $this->l('Will define your logo width on quotes'),
+                        'name' => 'EVERPSQUOTATION_LOGO_WIDTH',
                         'required' => true,
                     ),
                     array(
                         'col' => 3,
                         'type' => 'text',
                         'prefix' => '<i class="icon icon-envelope"></i>',
-                        'desc' => $this->l('Admin email for quotation mails copy'),
-                        'name' => 'EVERPSQUOTATION_ACCOUNT_EMAIL',
                         'label' => $this->l('Email'),
-                        'hint' => 'Leave empty for no use',
+                        'desc' => $this->l('Admin email for quotation mails copy'),
+                        'hint' => $this->l('Leave empty for no use'),
+                        'name' => 'EVERPSQUOTATION_ACCOUNT_EMAIL',
                     ),
                     // multilingual
                     array(
                         'col' => 3,
                         'type' => 'text',
                         'prefix' => '<i class="icon icon-download"></i>',
-                        'desc' => $this->l('Please specify quotation prefix'),
-                        'name' => 'EVERPSQUOTATION_PREFIX',
                         'label' => $this->l('Quotation prefix'),
-                        'hint' => 'Every quote will start with this prefix',
+                        'desc' => $this->l('Please specify quotation prefix'),
+                        'hint' => $this->l('Every quote will start with this prefix'),
+                        'name' => 'EVERPSQUOTATION_PREFIX',
                     ),
                     array(
                         'col' => 3,
                         'type' => 'text',
                         'lang' => true,
-                        'desc' => $this->l('Please specify subject of mails send'),
-                        'name' => 'EVERPSQUOTATION_MAIL_SUBJECT',
                         'label' => $this->l('Quotation mail subject'),
-                        'hint' => 'Quotations will be sent by email using tihs subject',
+                        'desc' => $this->l('Please specify subject of mails send'),
+                        'hint' => $this->l('Quotations will be sent by email using tihs subject'),
+                        'name' => 'EVERPSQUOTATION_MAIL_SUBJECT',
                     ),
                     array(
                         'type' => 'textarea',
                         'lang' => true,
-                        'desc' => $this->l('PDF filename'),
-                        'name' => 'EVERPSQUOTATION_FILENAME',
                         'label' => $this->l('File name for quotations'),
-                        'hint' => 'Every quote file will have this name. Required.',
+                        'desc' => $this->l('PDF filename'),
+                        'hint' => $this->l('Every quote file will have this name. Required.'),
+                        'name' => 'EVERPSQUOTATION_FILENAME',
+                        'required' => true,
                     ),
                     array(
                         'type' => 'textarea',
                         'autoload_rte' => true,
                         'lang' => true,
-                        'desc' => $this->l('Please specify quotation text on footer'),
-                        'name' => 'EVERPSQUOTATION_TEXT',
                         'label' => $this->l('Quotation text on footer'),
-                        'hint' => 'Add more informations, like SIRET, APE...',
+                        'desc' => $this->l('Please specify quotation text on footer'),
+                        'hint' => $this->l('Add more informations, like SIRET, APE...'),
+                        'name' => 'EVERPSQUOTATION_TEXT',
                     ),
                 ),
                 'submit' => array(
@@ -686,6 +690,12 @@ class Everpsquotation extends PaymentModule
             if (!in_array($product->id_category_default, $selected_cat)) {
                 return;
             }
+            if ($product->visibility == 'none'
+                || (bool)$product->available_for_order === false
+                || (bool)$product->show_price === false
+            ) {
+                return;
+            }
         }
         if (!array_intersect($allowed_groups, $customerGroups)
             || empty($allowed_groups)
@@ -729,6 +739,12 @@ class Everpsquotation extends PaymentModule
         foreach ($cartproducts as $cartproduct) {
             $product = new Product((int)$cartproduct['id_product']);
             if (!in_array((int)$product->id_category_default, $selected_cat)) {
+                return;
+            }
+            if ($product->visibility == 'none'
+                || (bool)$product->available_for_order === false
+                || (bool)$product->show_price === false
+            ) {
                 return;
             }
         }
@@ -872,9 +888,6 @@ class Everpsquotation extends PaymentModule
         $product = new Product(
             (int)Tools::getValue('id_product')
         );
-        if ($product->getCustomizationFieldIds()) {
-            return;
-        }
         $customerGroups = Customer::getGroupsStatic((int)$this->context->customer->id);
         $address = Address::getFirstCustomerAddressId((int)$this->context->customer->id);
 
@@ -904,6 +917,12 @@ class Everpsquotation extends PaymentModule
 
             if (!array_intersect($allowed_groups, $customerGroups)
                 || empty($allowed_groups)
+            ) {
+                return;
+            }
+            if ($product->visibility == 'none'
+                || (bool)$product->available_for_order === false
+                || (bool)$product->show_price === false
             ) {
                 return;
             }
@@ -1206,11 +1225,10 @@ class Everpsquotation extends PaymentModule
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
         curl_exec($handle);
         $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        curl_close($handle);
         if ($httpCode != 200) {
-            curl_close($handle);
             return false;
         }
-        curl_close($handle);
         $module_version = Tools::file_get_contents(
             $upgrade_link
         );
