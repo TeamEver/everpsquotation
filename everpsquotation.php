@@ -40,7 +40,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.3.9';
+        $this->version = '2.3.10';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -1078,19 +1078,20 @@ class Everpsquotation extends PaymentModule
         $quote->secure_key = (string)$cart->secure_key;
         $quote->recyclable = (int)$cart->recyclable;
         $quote->total_discounts = (float)$cartdetails['total_discounts'];
-        $quote->total_discounts_tax_incl = (float)$cartdetails['total_discounts_tax_exc'];
+        $quote->total_discounts_tax_incl = (float)$cartdetails['total_discounts'];
         $quote->total_discounts_tax_excl = (float)$cartdetails['total_discounts_tax_exc'];
-        $quote->total_paid_tax_incl = $total_products + $cartdetails['total_shipping_tax_exc'];
-        $quote->total_paid_tax_excl = (float)$total_products_wt + $cartdetails['total_shipping_tax_exc'];
-        $quote->total_products = (float)$total_products;
-        $quote->total_products_wt = (float)$total_products_wt;
+        $quote->total_paid_tax_incl = (float)$cartdetails['total_price'];
+        $quote->total_paid_tax_excl = (float)$cartdetails['total_price_without_tax'];
+        $quote->total_products = (float)$cartdetails['total_products'];
+        $quote->total_products_wt = (float)$cartdetails['total_products_wt'];
         $quote->total_shipping = (float)$cartdetails['total_shipping'];
-        $quote->total_shipping_tax_incl = (float)$cartdetails['total_shipping_tax_exc'];
+        $quote->total_shipping_tax_incl = (float)$cartdetails['total_shipping'];
         $quote->total_shipping_tax_excl = (float)$cartdetails['total_shipping_tax_exc'];
         $quote->total_wrapping = (float)$cartdetails['total_wrapping'];
-        $quote->total_wrapping_tax_incl = (float)$cartdetails['total_wrapping_tax_exc'];
+        $quote->total_wrapping_tax_incl = (float)$cartdetails['total_wrapping'];
         $quote->total_wrapping_tax_excl = (float)$cartdetails['total_wrapping_tax_exc'];
         $quote->valid = 0;
+
         $quote->date_add = $cart->date_add;
         $quote->date_upd = $cart->date_upd;
         $quote->save();

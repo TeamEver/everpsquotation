@@ -1,28 +1,19 @@
 <?php
+
 /**
- * 2019-2021 Team Ever
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
- *
- *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2021 Team Ever
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * Project : everpsquotation
+ * @author Team Ever
+ * @copyright Team Ever
+ * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
+ * @link http://team-ever.com
  */
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once _PS_MODULE_DIR_.'everpsquotation/models/EverpsquotationClass.php';
-require_once _PS_MODULE_DIR_.'everpsquotation/models/EverpsquotationDetail.php';
+require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationClass.php';
+require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationDetail.php';
 
 /**
  * @property Order $object
@@ -48,19 +39,19 @@ class AdminEverPsQuotationController extends ModuleAdminController
         a.id_everpsquotation_quotes AS id_pdf,
         CONCAT(LEFT(c.`firstname`, 1), \'. \', c.`lastname`) AS `customer`,
         IF((SELECT so.id_everpsquotation_quotes
-            FROM `'._DB_PREFIX_.'everpsquotation_quotes` so
+            FROM `' . _DB_PREFIX_ . 'everpsquotation_quotes` so
             WHERE so.id_customer = a.id_customer
             AND so.id_everpsquotation_quotes < a.id_everpsquotation_quotes LIMIT 1) > 0, 0, 1) as new,
         country_lang.name as cname,
         IF(a.valid, 1, 0) badge_success';
 
         $this->_join = '
-        LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
-        INNER JOIN `'._DB_PREFIX_.'address` address ON address.id_address = a.id_address_delivery
-        INNER JOIN `'._DB_PREFIX_.'country` country ON address.id_country = country.id_country
-        INNER JOIN `'._DB_PREFIX_.'country_lang` country_lang ON (
+        LEFT JOIN `' . _DB_PREFIX_ . 'customer` c ON (c.`id_customer` = a.`id_customer`)
+        INNER JOIN `' . _DB_PREFIX_ . 'address` address ON address.id_address = a.id_address_delivery
+        INNER JOIN `' . _DB_PREFIX_ . 'country` country ON address.id_country = country.id_country
+        INNER JOIN `' . _DB_PREFIX_ . 'country_lang` country_lang ON (
             country.`id_country` = country_lang.`id_country`
-            AND country_lang.`id_lang` = '.(int)$this->context->language->id.'
+            AND country_lang.`id_lang` = ' . (int)$this->context->language->id . '
         )';
         $this->_orderBy = 'id_everpsquotation_quotes';
         $this->_orderWay = 'DESC';
@@ -105,13 +96,13 @@ class AdminEverPsQuotationController extends ModuleAdminController
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS('
         SELECT DISTINCT c.id_country, cl.`name`
-        FROM `'._DB_PREFIX_.'orders` o
-        '.Shop::addSqlAssociation('orders', 'o').'
-        INNER JOIN `'._DB_PREFIX_.'address` a ON a.id_address = o.id_address_delivery
-        INNER JOIN `'._DB_PREFIX_.'country` c ON a.id_country = c.id_country
-        INNER JOIN `'._DB_PREFIX_.'country_lang` cl ON (
+        FROM `' . _DB_PREFIX_ . 'orders` o
+        ' . Shop::addSqlAssociation('orders', 'o') . '
+        INNER JOIN `' . _DB_PREFIX_ . 'address` a ON a.id_address = o.id_address_delivery
+        INNER JOIN `' . _DB_PREFIX_ . 'country` c ON a.id_country = c.id_country
+        INNER JOIN `' . _DB_PREFIX_ . 'country_lang` cl ON (
             c.`id_country` = cl.`id_country`
-            AND cl.`id_lang` = '.(int)$this->context->language->id.'
+            AND cl.`id_lang` = ' . (int)$this->context->language->id . '
         )
         ORDER BY cl.name ASC');
 
@@ -136,7 +127,7 @@ class AdminEverPsQuotationController extends ModuleAdminController
         $this->shopShareDatas = Shop::SHARE_ORDER;
         $this->toolbar_title = $this->l('Quotations list');
         $this->context->smarty->assign(array(
-            'everpsquotation_dir' => _PS_BASE_URL_ . '/modules/everpsquotation'
+            'everpsquotation_dir' => Tools::getHttpHost(true)._PS_BASE_URL_ . '/modules/everpsquotation'
         ));
     }
 
@@ -163,7 +154,7 @@ class AdminEverPsQuotationController extends ModuleAdminController
         parent::setMedia($isNewTheme);
 
         $this->addJqueryUI('ui.datepicker');
-        $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
+        $this->addJS(_PS_JS_DIR_ . 'vendor/d3.v3.min.js');
     }
 
     public function renderList()
@@ -178,9 +169,9 @@ class AdminEverPsQuotationController extends ModuleAdminController
         if ($module_instance->checkLatestEverModuleVersion($this->module_name, $module_instance->version)) {
             $html .= $this->context->smarty->fetch(
                 _PS_MODULE_DIR_
-                .'/'
-                .$this->module_name
-                .'/views/templates/admin/upgrade.tpl'
+                    . '/'
+                    . $this->module_name
+                    . '/views/templates/admin/upgrade.tpl'
             );
         }
         $html .= $lists;
@@ -198,10 +189,18 @@ class AdminEverPsQuotationController extends ModuleAdminController
             $pdf->render();
         }
         if (Tools::isSubmit('validateeverpsquotation_quotes')) {
+            require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationClass.php';
             $validation = new EverpsquotationClass(Tools::getValue('id_everpsquotation_quotes'));
             $validation->valid = 1;
             if (!$validation->update()) {
-                    $this->errors[] = Tools::displayError('An error has occurred: Can\'t update the current object');
+                $this->errors[] = Tools::displayError('An error has occurred: Can\'t update the current object');
+            }
+        }
+        if (Tools::isSubmit('deleteeverpsquotation_quotes')) {
+            require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationClass.php';
+            $quote = new EverpsquotationClass(Tools::getValue('id_everpsquotation_quotes'));
+            if (!$quote->delete()) {
+                $this->errors[] = Tools::displayError('An error has occurred: Can\'t update the current object');
             }
         }
         return parent::postProcess();
