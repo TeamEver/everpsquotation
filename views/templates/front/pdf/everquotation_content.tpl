@@ -215,7 +215,7 @@
                 {l s='Total products wt' mod='everpsquotation'}
             </td>
             <td align="right" style="border-top:0.5px solid #414040; border-right:0.5px solid #414040;">
-                {convertPrice price=$total_products_wt}
+                {convertPrice price=$total_products}
             </td>
         </tr>
         <tr>

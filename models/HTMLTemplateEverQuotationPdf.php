@@ -63,7 +63,6 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
                 );
             }
         }
-        // die(var_dump($customizations));
         $total_taxes = $everpsquotation->total_paid_tax_incl - $everpsquotation->total_paid_tax_excl;
 
         $this->smarty->assign(array(
@@ -98,13 +97,15 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
         $customerAddressDelivery = new Address($everpsquotation->id_address_delivery);
         $id_shop = (int)Context::getContext()->shop->id;
         $shop_address = $this->getShopAddress();
-        
-        $path_logo = _PS_IMG_ . Configuration::get(
-            'PS_LOGO_INVOICE',
-            null,
-            null,
-            (int)Context::getContext()->shop->id
+        $logo = Configuration::get(
+            'PS_LOGO_INVOICE'
         );
+        if (!$logo) {
+            $logo = Configuration::get(
+                'PS_LOGO'
+            );
+        }
+        $path_logo = _PS_IMG_ . $logo;
         $width = (int)Configuration::get('EVERPSQUOTATION_LOGO_WIDTH');
       
 

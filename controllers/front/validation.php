@@ -107,12 +107,11 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
         $quote->date_add = $cart->date_add;
         $quote->date_upd = $cart->date_upd;
         $quote->save();
-        $quoteid = (int)Db::getInstance()->Insert_ID();
 
         //Now create new Everpsquotationdetail object
         foreach ($cartproducts as $cartproduct) {
             $quotedetail = new EverpsquotationDetail();
-            $quotedetail->id_everpsquotation_quotes = (int)$quoteid;
+            $quotedetail->id_everpsquotation_quotes = (int)$quote->id;
             $quotedetail->id_warehouse = $cartdetails['total_discounts']['id_warehouse'];
             $quotedetail->id_shop = (int)$cartproduct['id_shop'];
             $quotedetail->product_id = (int)$cartproduct['id_product'];
@@ -152,7 +151,7 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
 
         $id_shop = (int)Context::getContext()->shop->id;
         $mailDir = _PS_MODULE_DIR_.'everpsquotation/mails/';
-        $pdf = new PDF($quoteid, 'EverQuotationPdf', Context::getContext()->smarty);
+        $pdf = new PDF($quote->id, 'EverQuotationPdf', Context::getContext()->smarty);
         $customerNames = $customer->firstname.' '.$customer->lastname;
         $attachment = array();
         $attachment['content'] = $pdf->render(false);

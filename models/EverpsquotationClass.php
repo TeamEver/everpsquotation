@@ -213,7 +213,7 @@ class EverpsquotationClass extends ObjectModel
             date_add,
             date_upd
             FROM `'._DB_PREFIX_.'cart`
-            WHERE id_cart = '.$id_cart
+            WHERE id_cart = '.(int)$id_cart
         );
         if ($copyCart) {
             $quoteid = (int)Db::getInstance()->Insert_ID();
@@ -226,7 +226,8 @@ class EverpsquotationClass extends ObjectModel
                         id_address_delivery,
                         id_shop,
                         id_product_attribute,
-                        id_customization
+                        id_customization,
+                        quantity
                     )
                     SELECT
                         '.(int)$quoteid.',
@@ -234,7 +235,8 @@ class EverpsquotationClass extends ObjectModel
                         id_address_delivery,
                         id_shop,
                         id_product_attribute,
-                        id_customization
+                        id_customization,
+                        quantity
                     FROM `'._DB_PREFIX_.'cart_product`
                     WHERE id_cart = '.(int)$id_cart
                 );
