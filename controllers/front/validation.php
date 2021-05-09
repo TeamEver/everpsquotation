@@ -186,10 +186,10 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             (string)$everShopEmail,
             Configuration::get('PS_SHOP_NAME')
         );
-        // Comment below to show quotation added template
-        $pdf = new PDF($quote->id, 'EverQuotationPdf', Context::getContext()->smarty);
-        $pdf->render();
-        // These lines won't work until previous PDF rendering  code is not commented
+        if ((bool)Configuration::get('EVERPSQUOTATION_RENDER_ON_VALIDATION') === true) {
+            $pdf = new PDF($quote->id, 'EverQuotationPdf', Context::getContext()->smarty);
+            $pdf->render();
+        }
         $my_quotations_link = Context::getContext()->link->getModuleLink(
             'everpsquotation',
             'quotations',

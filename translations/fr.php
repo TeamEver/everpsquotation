@@ -40,6 +40,9 @@ $_MODULE['<{everpsquotation}prestashop>everpsquotation_c8d36236207231793e306d7ca
 $_MODULE['<{everpsquotation}prestashop>everpsquotation_cd61f27c824b37ed0aeba7aad8940beb'] = 'Texte dans le pied de page des devis';
 $_MODULE['<{everpsquotation}prestashop>everpsquotation_3b82fb645d6b2e3d2381f938b9079b8f'] = 'Texte dans le pied de page des devis';
 $_MODULE['<{everpsquotation}prestashop>everpsquotation_c0b9246ffc0632a62d890d253865d0e7'] = 'Ajoutez des informations comme votre IBAN, votre SIRET, votre APE...';
+$_MODULE['<{everpsquotation}prestashop>everpsquotation_4061e02800b9a85b85c5e3fa713fd602'] = 'Permettre le téléchargement du PDF en un clic dans le tunnel de commande ?';
+$_MODULE['<{everpsquotation}prestashop>everpsquotation_87929ddc9c3ff31a2d835bee8391b85e'] = 'Téléchargera en un clic le PDF du devis dans le tunnel de commande et les barres latérales';
+$_MODULE['<{everpsquotation}prestashop>everpsquotation_381214e3f08408242c57efd336c19ba8'] = 'Sinon une page de confirmation s\'affichera, le PDF sera simplement envoyé par email';
 $_MODULE['<{everpsquotation}prestashop>everpsquotation_c9cc8cce247e49bae79f15173ce97354'] = 'Sauvegarder';
 $_MODULE['<{everpsquotation}prestashop>everpsquotation_93f91d918b83c196c35ce58287af7625'] = 'Erreur : suppression des devis sur désinstallation n\'est pas valide';
 $_MODULE['<{everpsquotation}prestashop>everpsquotation_419a4b0a6f9de360b716acfc9a2d8a0b'] = 'Erreur : largeur du logo n\'est pas valide';

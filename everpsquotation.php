@@ -41,7 +41,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '3.1.5';
+        $this->version = '3.1.6';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -442,6 +442,26 @@ class Everpsquotation extends PaymentModule
                         'hint' => $this->l('Add more informations, like SIRET, APE...'),
                         'name' => 'EVERPSQUOTATION_TEXT',
                     ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Render PDF on validation page ?'),
+                        'desc' => $this->l('Will download PDF on validation page without redirection'),
+                        'hint' => $this->l('Else PDF will be sent by email only, validation page will be shown'),
+                        'name' => 'EVERPSQUOTATION_RENDER_ON_VALIDATION',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => true,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => false,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -495,6 +515,12 @@ class Everpsquotation extends PaymentModule
             ) {
                 $this->postErrors[] = $this->l('Error: allow on product page is not valid');
             }
+            if (Tools::getValue('EVERPSQUOTATION_RENDER_ON_VALIDATION')
+                && !Validate::isBool(Tools::getValue('EVERPSQUOTATION_RENDER_ON_VALIDATION'))
+            ) {
+                $this->postErrors[] = $this->l('Error: render PDF on validation is not valid');
+            }
+
             // Multilingual validation
             foreach (Language::getLanguages(false) as $lang) {
                 if (!Tools::getIsset('EVERPSQUOTATION_TEXT_'.$lang['id_lang'])
@@ -611,6 +637,11 @@ class Everpsquotation extends PaymentModule
             $everpsquotation_text,
             true
         );
+        Configuration::updateValue(
+            'EVERPSQUOTATION_RENDER_ON_VALIDATION',
+            Tools::getValue('EVERPSQUOTATION_RENDER_ON_VALIDATION')
+        );
+
         $this->postSuccess[] = $this->l('All settings have been saved :-)');
     }
 
@@ -696,6 +727,12 @@ class Everpsquotation extends PaymentModule
                     'EVERPSQUOTATION_PREFIX'
                 )
             ),
+            'EVERPSQUOTATION_RENDER_ON_VALIDATION' => Tools::getValue(
+                'EVERPSQUOTATION_RENDER_ON_VALIDATION',
+                Configuration::get(
+                    'EVERPSQUOTATION_RENDER_ON_VALIDATION'
+                )
+            ),            
             'EVERPSQUOTATION_MAIL_SUBJECT' => (!empty(
                 $everpsquotation_subject[(int)Configuration::get('PS_LANG_DEFAULT')]
             )) ? $everpsquotation_subject : Configuration::getInt(
