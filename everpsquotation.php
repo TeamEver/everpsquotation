@@ -41,7 +41,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '3.1.3';
+        $this->version = '3.1.4';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -829,6 +829,7 @@ class Everpsquotation extends PaymentModule
         $allowed_groups = $this->getAllowedGroups();
         $customerGroups = Customer::getGroupsStatic((int)$this->context->customer->id);
         $address = Address::getFirstCustomerAddressId((int)$this->context->customer->id);
+        $id_shop = (int)Context::getContext()->shop->id;
         $my_quotations_link = Context::getContext()->link->getModuleLink(
             'everpsquotation',
             'quotations',

@@ -245,9 +245,6 @@ class AdminEverPsQuotationController extends ModuleAdminController
         if (!$token) {
             return;
         }
-        $everpsquotation = new EverpsquotationClass(
-            (int)$id_everpsquotation
-        );
         $quote_controller_link  = 'index.php?controller=AdminEverPsQuotation&token=';
         $quote_controller_link .= Tools::getAdminTokenLite('AdminEverPsQuotation');
         $quote_controller_link .= '&id_everpsquotation_quotes='.(int)$id_everpsquotation;
