@@ -62,14 +62,14 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             Tools::redirect('index.php?controller=order&step=1');
         }
 
-        $copycart = EverpsquotationClass::copyCartToQuoteCart(
+        $id_quote_cart = EverpsquotationCart::copyCartToQuoteCart(
             (int)$cart->id
         );
-        if (!$copycart) {
+        if (!Validate::isInt($id_quote_cart)) {
             die($this->trans('An error has occured.', array(), 'Modules.Everpsquotation.Shop'));
         }
 
-        //Create new quotation object
+        //Create new quotation object based on current cart
         $cartdetails = $cart->getSummaryDetails();
         $cartproducts = $cart->getProducts();
 
@@ -181,7 +181,14 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             (string)$everShopEmail,
             Configuration::get('PS_SHOP_NAME')
         );
+        $my_quotations_link = Context::getContext()->link->getModuleLink(
+            'everpsquotation',
+            'quotations',
+            array(),
+            true
+        );
         $this->context->smarty->assign(array(
+            'my_quotations_link' => $my_quotations_link,
             'shop_phone' => Configuration::get('PS_SHOP_PHONE', null, null, (int)$id_shop),
             'shop_email' => Configuration::get('PS_SHOP_EMAIL', null, null, (int)$id_shop),
         ));

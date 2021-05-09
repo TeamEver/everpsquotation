@@ -41,7 +41,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '3.1.2';
+        $this->version = '3.1.3';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -180,8 +180,11 @@ class Everpsquotation extends PaymentModule
         } else {
             $rewriteMode = false;
         }
+        $quote_controller_link  = 'index.php?controller=AdminEverPsQuotation&token=';
+        $quote_controller_link .= Tools::getAdminTokenLite('AdminEverPsQuotation');
 
         $this->context->smarty->assign(array(
+            'quote_controller_link' => $quote_controller_link,
             'everpsquotation_dir' => $this->_path,
             'rewrite_mode' => $rewriteMode,
         ));
@@ -826,13 +829,19 @@ class Everpsquotation extends PaymentModule
         $allowed_groups = $this->getAllowedGroups();
         $customerGroups = Customer::getGroupsStatic((int)$this->context->customer->id);
         $address = Address::getFirstCustomerAddressId((int)$this->context->customer->id);
+        $my_quotations_link = Context::getContext()->link->getModuleLink(
+            'everpsquotation',
+            'quotations',
+            array(),
+            true
+        );
 
         if (!in_array($product->id_category_default, $selected_cat)
             || !Configuration::get('PS_REWRITING_SETTINGS')
         ) {
             return;
         }
-        if ((bool)Configuration::get('EVERPSQUOTATION_PRODUCT')) {
+        if ((bool)Configuration::get('EVERPSQUOTATION_PRODUCT') === true) {
             if (Configuration::isCatalogMode()) {
                 $catalogMode = true;
             } else {
@@ -840,11 +849,14 @@ class Everpsquotation extends PaymentModule
             }
 
             $this->context->smarty->assign(array(
+                'my_quotations_link' => $my_quotations_link,
                 'cart_url' => $link->getPageLink('cart', true),
                 'my_account_url' => $link->getPageLink('my-account', true),
                 'address_url' => $link->getPageLink('address', true),
                 'catalogMode' => $catalogMode,
                 'selected_cat' => $selected_cat,
+                'shop_phone' => Configuration::get('PS_SHOP_PHONE', null, null, (int)$id_shop),
+                'shop_email' => Configuration::get('PS_SHOP_EMAIL', null, null, (int)$id_shop),
             ));
 
             if (!$this->context->customer->isLogged()) {
@@ -940,7 +952,7 @@ class Everpsquotation extends PaymentModule
         $ever_cart->save();
 
         // Then add product
-        $ever_cart->addProductToEverCart(
+        $ever_cart->addProductToQuoteCart(
             (int)$id_product,
             (int)$id_product_attribute,
             (int)$id_customization,
@@ -1032,6 +1044,58 @@ class Everpsquotation extends PaymentModule
             $quotedetail->total_price_tax_excl = (float)$total;
             $quotedetail->add();
         }
+        
+        //Preparing emails
+        if (Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL')) {
+            $everShopEmail = Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL');
+        } else {
+            $everShopEmail = Configuration::get('PS_SHOP_EMAIL');
+        }
+
+        // Subject
+        $ever_subject = Configuration::getInt('EVERPSQUOTATION_MAIL_SUBJECT');
+        $subject = $ever_subject[(int)Context::getContext()->language->id];
+        // Filename
+        $filename = Configuration::getInt('EVERPSQUOTATION_FILENAME');
+        $ever_filename = $filename[(int)Context::getContext()->language->id];
+
+        $id_shop = (int)Context::getContext()->shop->id;
+        $mailDir = _PS_MODULE_DIR_.'everpsquotation/mails/';
+        $pdf = new PDF($quote->id, 'EverQuotationPdf', Context::getContext()->smarty);
+        $customer = Context::getContext()->customer;
+        $customerNames = $customer->firstname.' '.$customer->lastname;
+        $attachment = array();
+        $attachment['content'] = $pdf->render(false);
+        $attachment['name'] = $ever_filename;
+        $attachment['mime'] = 'application/pdf';
+        Mail::send(
+            (int)$this->context->language->id,
+            'everquotecustomer',
+            (string)$subject,
+            array(
+                '{shop_name}'=>Configuration::get('PS_SHOP_NAME'),
+                '{shop_logo}'=>_PS_IMG_DIR_.Configuration::get(
+                    'PS_LOGO',
+                    null,
+                    null,
+                    (int)$id_shop
+                ),
+                '{firstname}' => (string)$customer->firstname,
+                '{lastname}' => (string)$customer->lastname,
+            ),
+            (string)$customer->email,
+            (string)$customerNames,
+            (string)$everShopEmail,
+            Configuration::get('PS_SHOP_NAME'),
+            $attachment,
+            null,
+            $mailDir,
+            false,
+            null,
+            (string)$everShopEmail,
+            (string)$everShopEmail,
+            Configuration::get('PS_SHOP_NAME')
+        );
 
         // Render PDF for direct download
         $pdf = new PDF($quote->id, 'EverQuotationPdf', Context::getContext()->smarty);

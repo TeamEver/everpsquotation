@@ -21,8 +21,10 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationCart.php';
 require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationClass.php';
 require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationDetail.php';
+require_once _PS_MODULE_DIR_ . 'everpsquotation/models/HTMLTemplateEverQuotationPdf.php';
 
 /**
  * @property Order $object
@@ -102,6 +104,13 @@ class AdminEverPsQuotationController extends ModuleAdminController
                 'currency' => true,
                 'badge_success' => true
             ),
+            'valid' => array(
+                'title' => $this->l('Valid'),
+                'type' => 'bool',
+                'active' => 'statusvalid',
+                'orderby' => false,
+                'class' => 'fixed-width-sm'
+            ),
             'date_add' => array(
                 'title' => $this->l('Date'),
                 'align' => 'text-center',
@@ -143,8 +152,11 @@ class AdminEverPsQuotationController extends ModuleAdminController
         $this->shopLinkType = 'shop';
         $this->shopShareDatas = Shop::SHARE_ORDER;
         $this->toolbar_title = $this->l('Quotations list');
+        $moduleConfUrl  = 'index.php?controller=AdminModules&configure=everpsquotation&token=';
+        $moduleConfUrl .= Tools::getAdminTokenLite('AdminModules');
         $this->context->smarty->assign(array(
-            'everpsquotation_dir' => Tools::getHttpHost(true)._PS_BASE_URL_ . '/modules/everpsquotation'
+            'moduleConfUrl' => $moduleConfUrl,
+            'everpsquotation_dir' => Tools::getHttpHost(true).'/modules/everpsquotation'
         ));
     }
 
@@ -178,8 +190,7 @@ class AdminEverPsQuotationController extends ModuleAdminController
     {
         $this->initToolbar();
         $this->addRowAction('view');
-        $this->addRowAction('delete');
-        $this->addRowAction('validate');
+        $this->addRowAction('dropQuote');
         $lists = parent::renderList();
         $html = $this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsquotation/views/templates/admin/header.tpl');
         $module_instance = Module::getInstanceByName($this->module_name);
@@ -200,26 +211,56 @@ class AdminEverPsQuotationController extends ModuleAdminController
     public function postProcess()
     {
         if (Tools::isSubmit('vieweverpsquotation_quotes')) {
-            $id_everpsquotation_quotes = Tools::getValue('id_everpsquotation_quotes');
-            require_once _PS_MODULE_DIR_ . 'everpsquotation/models/HTMLTemplateEverQuotationPdf.php';
+            $id_everpsquotation_quotes = Tools::getValue(
+                'id_everpsquotation_quotes'
+            );
             $pdf = new PDF($id_everpsquotation_quotes, 'EverQuotationPdf', Context::getContext()->smarty);
             $pdf->render();
         }
-        if (Tools::isSubmit('validateeverpsquotation_quotes')) {
-            require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationClass.php';
-            $validation = new EverpsquotationClass(Tools::getValue('id_everpsquotation_quotes'));
-            $validation->valid = 1;
-            if (!$validation->update()) {
+        if (Tools::getIsset('statusvalideverpsquotation_quotes')) {
+            $quote = new EverpsquotationClass(
+                (int)Tools::getValue('id_everpsquotation_quotes')
+            );
+            $quote->valid = !$quote->valid;
+            if (!$quote->update()) {
                 $this->errors[] = Tools::displayError('An error has occurred: Can\'t update the current object');
             }
         }
-        if (Tools::isSubmit('deleteeverpsquotation_quotes')) {
-            require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationClass.php';
-            $quote = new EverpsquotationClass(Tools::getValue('id_everpsquotation_quotes'));
-            if (!$quote->delete()) {
+        if (Tools::getIsset('deleteeverpsquotation_quotes')) {
+            $quote = new EverpsquotationClass(
+                (int)Tools::getValue('id_everpsquotation_quotes')
+            );
+            $quote_cart = new EverpsquotationCart(
+                (int)$quote->id_cart
+            );
+            if (!$quote->deleteQuoteCart() || $quote_cart->dropQuoteCartProducts()) {
                 $this->errors[] = Tools::displayError('An error has occurred: Can\'t update the current object');
             }
         }
         return parent::postProcess();
+    }
+
+    public function displayDropQuoteLink($token, $id_everpsquotation)
+    {
+        if (!$token) {
+            return;
+        }
+        $everpsquotation = new EverpsquotationClass(
+            (int)$id_everpsquotation
+        );
+        $quote_controller_link  = 'index.php?controller=AdminEverPsQuotation&token=';
+        $quote_controller_link .= Tools::getAdminTokenLite('AdminEverPsQuotation');
+        $quote_controller_link .= '&id_everpsquotation_quotes='.(int)$id_everpsquotation;
+        $quote_controller_link .= '&deleteeverpsquotation_quotes';
+
+        $this->context->smarty->assign(array(
+            'href' => $quote_controller_link,
+            'confirm' => null,
+            'action' => $this->l('Delete')
+        ));
+
+        return $this->context->smarty->fetch(
+            _PS_MODULE_DIR_.'everpsquotation/views/templates/admin/helpers/lists/list_action_drop_quote.tpl'
+        );
     }
 }

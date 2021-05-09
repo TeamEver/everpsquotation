@@ -16,6 +16,7 @@
  *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
+
 use PrestaShop\PrestaShop\Adapter\ServiceLocator;
 
 class EverpsquotationCart extends ObjectModel
@@ -156,18 +157,111 @@ class EverpsquotationCart extends ObjectModel
         return Db::getInstance()->getValue($sql);
     }
 
-    public static function deleteEverQuoteCart($id_evercart)
+    public static function copyCartToQuoteCart($id_cart)
     {
-        $evercart = new EverpsquotationCart((int)$id_evercart);
-        if (!$evercart->delete()) {
-            die('cant delete quotation cart');
-        } else {
-            return true;
+        $copy_cart_query = Db::getInstance()->Execute(
+            'INSERT INTO `'._DB_PREFIX_.'everpsquotation_cart`
+            (
+                id_shop_group,
+                id_shop,
+                id_carrier,
+                delivery_option,
+                id_lang,
+                id_address_delivery,
+                id_address_invoice,
+                id_currency,
+                id_customer,
+                id_guest,
+                secure_key,
+                recyclable,
+                allow_seperated_package,
+                date_add,
+                date_upd
+            )
+            SELECT
+            id_shop_group,
+            id_shop,
+            id_carrier,
+            delivery_option,
+            id_lang,
+            id_address_delivery,
+            id_address_invoice,
+            id_currency,
+            id_customer,
+            id_guest,
+            secure_key,
+            recyclable,
+            allow_seperated_package,
+            date_add,
+            date_upd
+            FROM `'._DB_PREFIX_.'cart`
+            WHERE id_cart = '.(int)$id_cart
+        );
+        if ($copy_cart_query) {
+            $id_quote_cart = (int)Db::getInstance()->Insert_ID();
+            Db::getInstance()->Execute(
+                'INSERT INTO `'._DB_PREFIX_.'everpsquotation_cart_product`
+                (
+                    id_everpsquotation_cart,
+                    id_product,
+                    id_address_delivery,
+                    id_shop,
+                    id_product_attribute,
+                    id_customization,
+                    quantity
+                )
+                SELECT
+                    '.(int)$id_quote_cart.',
+                    id_product,
+                    id_address_delivery,
+                    id_shop,
+                    id_product_attribute,
+                    id_customization,
+                    quantity
+                FROM `'._DB_PREFIX_.'cart_product`
+                WHERE id_cart = '.(int)$id_cart
+            );
+            return (int)$id_quote_cart;
         }
+        return false;
     }
 
-    public function addProductToEverCart($id_product, $id_product_attribute, $id_customization, $qty)
+    public function getProductQtyFromQuoteCart($id_product, $id_product_attribute, $id_customization)
     {
+        $sql = new DbQuery();
+        $sql->select(
+            'qty'
+        );
+        $sql->from(
+            'everpsquotation_cart_product'
+        );
+        $sql->where(
+            'id_product = '.(int)$id_product
+        );
+        $sql->where(
+            'id_product_attribute = '.(int)$id_product_attribute
+        );
+        $sql->where(
+            'id_customization = '.(int)$id_customization
+        );
+        return (int)Db::getInstance()->getValue($sql);
+    }
+
+    public function addProductToQuoteCart($id_product, $id_product_attribute, $id_customization, $qty)
+    {
+        $cart_qty = (int)$this->getProductQtyFromQuoteCart(
+            (int)$id_product,
+            (int)$id_product_attribute,
+            (int)$id_customization
+        );
+        if ($cart_qty > 0) {
+            return $this->updateProductToQuoteCart(
+                (int)$id_product,
+                (int)$id_product_attribute,
+                (int)$id_customization,
+                (int)$qty
+            );
+        }
         return Db::getInstance()->insert(
             'everpsquotation_cart_product',
             array(
@@ -186,7 +280,7 @@ class EverpsquotationCart extends ObjectModel
         );
     }
 
-    public function updateProductToEverCart($id_product, $id_product_attribute, $id_customization, $qty)
+    public function updateProductToQuoteCart($id_product, $id_product_attribute, $id_customization, $qty)
     {
         $where = 'id_everpsquotation_cart = '.(int)$this->id.' 
             AND id_product = '.(int)$id_product.' 
@@ -209,6 +303,19 @@ class EverpsquotationCart extends ObjectModel
             AND id_customization = '.(int)$id_customization;
         return Db::getInstance()->delete(
             'everpsquotation_cart_product',
+            $where
+        );
+    }
+
+    public function dropQuoteCartProducts()
+    {
+        $where = 'id_everpsquotation_cart = '.(int)$this->id;
+        Db::getInstance()->delete(
+            'everpsquotation_cart_product',
+            $where
+        );
+        Db::getInstance()->delete(
+            'everpsquotation_cart',
             $where
         );
     }

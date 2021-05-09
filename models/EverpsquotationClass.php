@@ -167,14 +167,14 @@ class EverpsquotationClass extends ObjectModel
         }
     }
 
-    public static function deleteQuoteCart($id_everpsquotation_cart)
+    public function deleteQuoteCart()
     {
         return Db::getInstance()->delete(
-            'everpsquotation_cart',
-            'id_everpsquotation_cart = '.(int)$id_everpsquotation_cart
+            'everpsquotation_quotes',
+            'id_everpsquotation_quotes = '.(int)$this->id
         ) && Db::getInstance()->delete(
-            'everpsquotation_cart_product',
-            'id_everpsquotation_cart = '.(int)$id_everpsquotation_cart
+            'everpsquotation_quote_detail',
+            'id_everpsquotation_quotes = '.(int)$this->id
         );
     }
 
