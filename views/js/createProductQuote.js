@@ -9,6 +9,8 @@
 /*https://webkul.com/blog/get-action-change-product-combination-product-page-front-end/*/
 $(document).ready(function() {
     $(document).on('change', '.product-variants [data-product-attribute], #quantity_wanted, #ever_quantity_wanted', function (event) {
+        var qty = $('#quantity_wanted').val();
+        $('#ever_quantity_wanted').val(qty);
         var query = $(event.target.form).serialize() + '&ajax=1&action=productrefresh';
         var actionURL = $(event.target.form).attr('action');
         $.post(actionURL, query, null, 'json').then(function (resp) {

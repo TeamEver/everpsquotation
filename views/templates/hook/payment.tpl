@@ -17,7 +17,7 @@
 *}
 
 <p class="payment_module">
-	<a href="{$link->getModuleLink('everpsquotation', 'validation', [], true)|escape:'html'}">
+	<a href="{$link->getModuleLink('everpsquotation', 'validation', [], true)|escape:'htmlall':'UTF-8'}">
 		{l s='Request for a quote' mod='everpsquotation'}
 	</a>
 </p>

@@ -90,14 +90,21 @@ class AdminEverPsQuotationController extends ModuleAdminController
         $this->fields_list = array_merge($this->fields_list, array(
             'total_paid_tax_incl' => array(
                 'title' => $this->l('Total'),
-                'align' => 'text-right',
+                'align' => 'text-center',
+                'type' => 'price',
+                'currency' => true,
+                'badge_success' => true
+            ),
+            'total_shipping_tax_incl' => array(
+                'title' => $this->l('Total shipping'),
+                'align' => 'text-center',
                 'type' => 'price',
                 'currency' => true,
                 'badge_success' => true
             ),
             'date_add' => array(
                 'title' => $this->l('Date'),
-                'align' => 'text-right',
+                'align' => 'text-center',
                 'type' => 'datetime',
                 'filter_key' => 'a!date_add'
             ),
@@ -128,7 +135,8 @@ class AdminEverPsQuotationController extends ModuleAdminController
             'list' => $country_array,
             'filter_key' => 'country!id_country',
             'filter_type' => 'int',
-            'order_key' => 'cname'
+            'order_key' => 'cname',
+            'align' => 'text-center'
         );
         $this->fields_list = array_merge($part1, $part2);
 

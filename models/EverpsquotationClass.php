@@ -157,7 +157,6 @@ class EverpsquotationClass extends ObjectModel
     public function __construct($id = null, $id_lang = null)
     {
         parent::__construct($id, $id_lang);
-
         $is_admin = (is_object(Context::getContext()->controller)
             && Context::getContext()->controller->controller_type == 'admin');
         if ($this->id_customer && !$is_admin) {
@@ -168,15 +167,19 @@ class EverpsquotationClass extends ObjectModel
         }
     }
 
-    public static function evercartexists($id_cart)
+    public static function deleteQuoteCart($id_everpsquotation_cart)
     {
-        return Db::getInstance()->delete('everpsquotation_cart', 'id_everpsquotation_cart = '.$id_cart)
-            && Db::getInstance()->delete('everpsquotation_cart_product', 'id_everpsquotation_cart = '.$id_cart);
+        return Db::getInstance()->delete(
+            'everpsquotation_cart',
+            'id_everpsquotation_cart = '.(int)$id_everpsquotation_cart
+        ) && Db::getInstance()->delete(
+            'everpsquotation_cart_product',
+            'id_everpsquotation_cart = '.(int)$id_everpsquotation_cart
+        );
     }
 
-    public static function evercopycart($id_cart)
+    public static function copyCartToQuoteCart($id_cart)
     {
-        $isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $copyCart = Db::getInstance()->Execute(
             'INSERT INTO `'._DB_PREFIX_.'everpsquotation_cart`
             (
@@ -217,90 +220,75 @@ class EverpsquotationClass extends ObjectModel
         );
         if ($copyCart) {
             $quoteid = (int)Db::getInstance()->Insert_ID();
-            if ((bool)$isSeven === true) {
-                $copyCartProducts = Db::getInstance()->Execute(
-                    'INSERT INTO `'._DB_PREFIX_.'everpsquotation_cart_product`
-                    (
-                        id_everpsquotation_cart,
-                        id_product,
-                        id_address_delivery,
-                        id_shop,
-                        id_product_attribute,
-                        id_customization,
-                        quantity
-                    )
-                    SELECT
-                        '.(int)$quoteid.',
-                        id_product,
-                        id_address_delivery,
-                        id_shop,
-                        id_product_attribute,
-                        id_customization,
-                        quantity
-                    FROM `'._DB_PREFIX_.'cart_product`
-                    WHERE id_cart = '.(int)$id_cart
-                );
-            } else {
-                $copyCartProducts = Db::getInstance()->Execute(
-                    'INSERT INTO `'._DB_PREFIX_.'everpsquotation_cart_product`
-                    (
-                        id_everpsquotation_cart,
-                        id_product,
-                        id_address_delivery,
-                        id_shop,
-                        id_product_attribute
-                    )
-                    SELECT
-                        '.(int)$quoteid.',
-                        id_product,
-                        id_address_delivery,
-                        id_shop,
-                        id_product_attribute
-                    FROM `'._DB_PREFIX_.'cart_product`
-                    WHERE id_cart = '.(int)$id_cart
-                );
-            }
-            if ($copyCartProducts) {
-                return true;
-            }
+            return Db::getInstance()->Execute(
+                'INSERT INTO `'._DB_PREFIX_.'everpsquotation_cart_product`
+                (
+                    id_everpsquotation_cart,
+                    id_product,
+                    id_address_delivery,
+                    id_shop,
+                    id_product_attribute,
+                    id_customization,
+                    quantity
+                )
+                SELECT
+                    '.(int)$quoteid.',
+                    id_product,
+                    id_address_delivery,
+                    id_shop,
+                    id_product_attribute,
+                    id_customization,
+                    quantity
+                FROM `'._DB_PREFIX_.'cart_product`
+                WHERE id_cart = '.(int)$id_cart
+            );
         }
-    }
-
-    public static function erase($id_everpsquotation_quotes)
-    {
-        $everquote_obj = new EverpsquotationClass($id_everpsquotation_quotes);
-
-        return $everquote_obj->delete()
-                && Db::getInstance()->delete(
-                    'everpsquotation_quote_detail',
-                    'id_everpsquotation_quotes = '.$id_everpsquotation_quotes
-                );
+        return false;
     }
 
     public static function truncate()
     {
-        return Db::getInstance()->Execute('TRUNCATE `'._DB_PREFIX_.'everpsquotation_quotes`')
-            && Db::getInstance()->Execute('TRUNCATE `'._DB_PREFIX_.'everpsquotation_quote_detail`');
+        return Db::getInstance()->Execute(
+            'TRUNCATE `'._DB_PREFIX_.'everpsquotation_quotes`'
+        ) && Db::getInstance()->Execute(
+            'TRUNCATE `'._DB_PREFIX_.'everpsquotation_quote_detail`'
+        );
     }
 
-    public static function validateEverPsQuote($id_everpsquotation_quotes)
+    public function validateEverPsQuote()
     {
-        return Db::getInstance()->Execute(
-            'UPDATE `'._DB_PREFIX_.'everpsquotation_quotes`
-            SET valid = 1
-            WHERE id_everpsquotation_quotes = '.$id_everpsquotation_quotes
+        $where = 'id_everpsquotation_quotes = '.(int)$this->id;
+        return Db::getInstance()->update(
+            'everpsquotation_quotes',
+            array(
+                'valid' => 1
+            ),
+            $where
+        );
+    }
+
+    public function unvalidateEverPsQuote()
+    {
+        $where = 'id_everpsquotation_quotes = '.(int)$this->id;
+        return Db::getInstance()->update(
+            'everpsquotation_quotes',
+            array(
+                'valid' => 0
+            ),
+            $where
         );
     }
 
     public static function getQuoteById($id_everpsquotation_quotes)
     {
-        return Db::getInstance()->Execute(
-            'SELECT * FROM `'._DB_PREFIX_.'everpsquotation_quotes`
-            WHERE id_everpsquotation_quotes = '.$id_everpsquotation_quotes
-        );
+        $sql = new DbQuery();
+        $sql->select('*');
+        $sql->from('everpsquotation_quotes');
+        $sql->where('id_everpsquotation_quotes = '.(int)$id_everpsquotation_quotes);
+        return Db::getInstance()->Execute($sql);
     }
 
-    public static function getQuoteByIdCustomer($id_customer)
+    public static function getQuotesByIdCustomer($id_customer)
     {
         $sql = new DbQuery();
         $sql->select('*');

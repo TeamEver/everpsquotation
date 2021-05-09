@@ -221,7 +221,7 @@
         <tr>
             <td colspan="3"></td>
             <td align="right" style="margin:0; background-color: #414040;color:white">
-                {l s='Total carrier wt' mod='everpsquotation'}
+                {l s='Total carrier' mod='everpsquotation'}
             </td>
             <td align="right" style=" border-right:0.5px solid #414040;">
                 {convertPrice price=$total_shipping_tax_excl}

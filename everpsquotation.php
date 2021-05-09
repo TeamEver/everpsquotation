@@ -41,7 +41,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '2.4.1';
+        $this->version = '3.1.1';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -51,7 +51,6 @@ class Everpsquotation extends PaymentModule
         $this->displayName = $this->l('Ever PS Quotation');
         $this->description = $this->l('Simply accept quotations on your Prestashop !');
         $this->confirmUninstall = $this->l('Do you REALLY want to uninstall this awesome module ?');
-        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
@@ -74,11 +73,6 @@ class Everpsquotation extends PaymentModule
                 return false;
             }
         }
-        if ($this->isSeven) {
-            $paymenthook = 'paymentOptions';
-        } else {
-            $paymenthook = 'payment';
-        }
         return (parent::install()
             && $this->registerHook('header')
             && $this->registerHook('displayCustomerAccount')
@@ -86,7 +80,7 @@ class Everpsquotation extends PaymentModule
             && $this->registerHook('LeftColumn')
             && $this->registerHook('RightColumn')
             && $this->registerHook('displayReassurance')
-            // && $this->registerHook($paymenthook)
+            && $this->registerHook('paymentOptions')
             && $this->installModuleTab('AdminEverPsQuotation'));
     }
 
@@ -499,7 +493,7 @@ class Everpsquotation extends PaymentModule
                 .$lang['id_lang']
             ) : '';
         }
-         Configuration::updateValue(
+        Configuration::updateValue(
             'EVERPSQUOTATION_DROP_SQL',
             Tools::getValue('EVERPSQUOTATION_DROP_SQL')
         );
@@ -565,7 +559,6 @@ class Everpsquotation extends PaymentModule
      */
     protected function getConfigFormValues()
     {
-        $groupShop = Shop::getGroupFromShop((int)$this->context->shop->id);
         $everpsquotation_subject = array();
         $everpsquotation_filename = array();
         $everpsquotation_text = array();
@@ -714,55 +707,7 @@ class Everpsquotation extends PaymentModule
 
         return array($newOption);
     }
-
-    public function hookPayment($params)
-    {
-        if (!$this->active) {
-            return;
-        }
-
-        $cart = $this->context->cart;
-        $total_cart = $this->context->cart->getOrderTotal(
-            false,
-            Cart::BOTH_WITHOUT_SHIPPING,
-            null,
-            null,
-            true
-        );
-        if ((float)Configuration::get('EVERPSQUOTATION_MIN_AMOUNT') > 0
-            && $total_cart < Configuration::get('EVERPSQUOTATION_MIN_AMOUNT')) {
-            return;
-        }
-        $cartproducts = $cart->getProducts();
-        $customerGroups = Customer::getGroupsStatic((int)$cart->id_customer);
-        $selected_cat = $this->getAllowedCategories();
-        $allowed_groups = $this->getAllowedGroups();
-        foreach ($cartproducts as $cartproduct) {
-            $product = new Product((int)$cartproduct['id_product']);
-            if (!in_array((int)$product->id_category_default, $selected_cat)) {
-                return;
-            }
-            if ($product->visibility == 'none'
-                || (bool)$product->available_for_order === false
-                || (bool)$product->show_price === false
-            ) {
-                return;
-            }
-        }
-        if (!array_intersect($allowed_groups, $customerGroups)
-            || empty($allowed_groups)
-        ) {
-            return;
-        }
-
-        $this->smarty->assign(array(
-            'this_path' => $this->_path,
-            'this_path_bw' => $this->_path,
-            'this_path_ssl' => Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/'
-        ));
-        return $this->display(__FILE__, 'payment.tpl');
-    }
-
+    
     public function hookHeader($params)
     {
         $controller_name = Tools::getValue('controller');
@@ -790,20 +735,11 @@ class Everpsquotation extends PaymentModule
                 } else {
                     $quantity = (int)Tools::getValue('ever_qty');
                 }
-                $this->updateCartForQuote(
+                $this->createSimpleProductQuote(
                     (int)Tools::getValue('id_product'),
                     (int)$id_attribute,
                     (int)Tools::getValue('id_customization'),
-                    (int)$quantity,
-                    (int)$this->context->cart->id
-                );
-                $this->createQuote();
-                $this->removeCartForQuote(
-                    (int)Tools::getValue('id_product'),
-                    (int)$id_attribute,
-                    (int)Tools::getValue('id_customization'),
-                    (int)$quantity,
-                    (int)$this->context->cart->id
+                    (int)$quantity
                 );
             }
         }
@@ -878,13 +814,6 @@ class Everpsquotation extends PaymentModule
 
     public function hookDisplayReassurance()
     {
-        $total_cart = $this->context->cart->getOrderTotal(
-            false,
-            Cart::BOTH_WITHOUT_SHIPPING,
-            null,
-            null,
-            true
-        );
         $product = new Product(
             (int)Tools::getValue('id_product')
         );
@@ -958,11 +887,7 @@ class Everpsquotation extends PaymentModule
 
     public function hookDisplayCustomerAccount()
     {
-        if ($this->isSeven) {
-            return $this->display(__FILE__, 'views/templates/front/myaccount.tpl');
-        } else {
-            return $this->display(__FILE__, 'views/templates/front/myaccount16.tpl');
-        }
+        return $this->display(__FILE__, 'views/templates/front/myaccount.tpl');
     }
 
     private function getAllowedCategories()
@@ -980,7 +905,6 @@ class Everpsquotation extends PaymentModule
 
     private function getAllowedGroups()
     {
-        $groupShop = Shop::getGroupFromShop((int)$this->context->shop->id);
         $allowed_groups = Tools::jsonDecode(
             Configuration::get(
                 'EVERPSQUOTATION_GROUPS'
@@ -992,158 +916,46 @@ class Everpsquotation extends PaymentModule
         return $allowed_groups;
     }
 
-    /**
-     * addToCart in ps_cart_product table
-     * @param int $id_cart
-     * @param int $id_product
-     * @param int $id_shop
-     * @return bool result
-     */
-    public function updateCartForQuote($id_product, $id_product_attribute, $id_customization, $qty, $id_cart)
-    {
-        $id_shop = Context::getContext()->shop->id;
-        if ((int)$qty < 1) {
-            $qty = 1;
-        }
-        $cart = new Cart(
-            (int)$id_cart
-        );
-        $date = new DateTime();
-        $mysqltime =  $date->format('Y-m-d H:i:s');
-
-        $sql = new DbQuery();
-        $sql->select('quantity');
-        $sql->from('cart_product');
-        $sql->where('id_product = ' . $id_product);
-        $sql->where('id_product_attribute = ' . $id_product_attribute);
-        $sql->where('id_customization = ' . $id_customization);
-        $sql->where('id_cart = ' . $id_cart);
-        $sql->where('id_shop = ' . $id_shop);
-
-        $quantity = Db::getInstance()->getValue($sql);
-
-        if ($quantity) {
-            $quantity += $qty;
-            $where = 'id_cart = '
-            .(int)$id_cart
-            .' AND id_product = '
-            .(int)$id_product
-            .' AND id_product_attribute = '
-            .(int)$id_product_attribute
-            .' AND id_customization = '
-            .(int)$id_customization
-            .' AND id_shop = '
-            .(int)$id_shop;
-            // Update cart
-            Db::getInstance()->update(
-                'cart_product',
-                array(
-                    "quantity" => (int)$quantity
-                ),
-                $where
-            );
-        } else {
-            Db::getInstance()->insert(
-                'cart_product',
-                array(
-                    'id_cart' => (int)$id_cart,
-                    'id_product' => (int)$id_product,
-                    'id_address_delivery' => (int)$cart->id_address_delivery,
-                    'id_shop' => (int)$id_shop,
-                    'id_product_attribute' => (int)$id_product_attribute,
-                    'id_customization' => (int)$id_customization,
-                    'quantity' => (int)$qty,
-                    'date_add' => $mysqltime
-                )
-            );
-        }
-        Hook::exec('actionCartSave');
-    }
-
-    public function removeCartForQuote($id_product, $id_product_attribute, $id_customization, $qty, $id_cart)
-    {
-        $id_shop = Context::getContext()->shop->id;
-        if ((int)$qty < 1) {
-            $qty = 1;
-        }
-        $cart = new Cart(
-            (int)$id_cart
-        );
-        $date = new DateTime();
-        $mysqltime =  $date->format('Y-m-d H:i:s');
-
-        $sql = new DbQuery();
-        $sql->select('quantity');
-        $sql->from('cart_product');
-        $sql->where('id_product = ' . $id_product);
-        $sql->where('id_product_attribute = ' . $id_product_attribute);
-        $sql->where('id_customization = ' . $id_customization);
-        $sql->where('id_cart = ' . $id_cart);
-        $sql->where('id_shop = ' . $id_shop);
-
-        $quantity = Db::getInstance()->getValue($sql);
-        $real_qty = $quantity - $qty;
-        $where = 'id_cart = '
-        .(int)$id_cart
-        .' AND id_product = '
-        .(int)$id_product
-        .' AND id_product_attribute = '
-        .(int)$id_product_attribute
-        .' AND id_customization = '
-        .(int)$id_customization
-        .' AND id_shop = '
-        .(int)$id_shop;
-        if ((int)$real_qty <= 0) {
-            // Update cart
-            Db::getInstance()->delete(
-                'cart_product',
-                $where
-            );
-        } else {
-            Db::getInstance()->update(
-                'cart_product',
-                array(
-                    "quantity" => (int)$real_qty
-                ),
-                $where
-            );
-        }
-        Hook::exec('actionCartSave');
-    }
-
-    private function createQuote()
+    private function createSimpleProductQuote($id_product, $id_product_attribute, $id_customization, $qty)
     {
         $cart = Context::getContext()->cart;
-        if ($cart->id_customer == 0
-            || $cart->id_address_delivery == 0
-            || $cart->id_address_invoice == 0
-        ) {
-            return false;
-        }
-        $customer = new Customer((int)$cart->id_customer);
 
-        if (!Validate::isLoadedObject($customer)) {
-            return false;
-        }
-        $total_cart = $cart->getOrderTotal(
-            false,
-            Cart::BOTH_WITHOUT_SHIPPING,
-            null,
-            null,
-            true
+        // First create Quote Cart
+        $ever_cart = new EverpsquotationCart();
+        $ever_cart->id_shop_group = $cart->id_shop_group;
+        $ever_cart->id_shop = $cart->id_shop;
+        $ever_cart->id_carrier = $cart->id_carrier;
+        $ever_cart->delivery_option = $cart->delivery_option;
+        $ever_cart->id_lang = $cart->id_lang;
+        $ever_cart->id_address_delivery = $cart->id_address_delivery;
+        $ever_cart->id_address_invoice = $cart->id_address_invoice;
+        $ever_cart->id_currency = $cart->id_currency;
+        $ever_cart->id_customer = $cart->id_customer;
+        $ever_cart->id_guest = $cart->id_guest;
+        $ever_cart->secure_key = $cart->secure_key;
+        $ever_cart->recyclable = $cart->recyclable;
+        $ever_cart->allow_seperated_package = $cart->allow_seperated_package;
+        $ever_cart->date_add = $cart->date_add;
+        $ever_cart->date_upd = $cart->date_upd;
+        $ever_cart->save();
+
+        // Then add product
+        $ever_cart->addProductToEverCart(
+            (int)$id_product,
+            (int)$id_product_attribute,
+            (int)$id_customization,
+            (int)$qty
         );
-        if ((float)Configuration::get('EVERPSQUOTATION_MIN_AMOUNT') > 0
-            && $total_cart < Configuration::get('EVERPSQUOTATION_MIN_AMOUNT')
-        ) {
-            return false;
-        }
-        $copycart = EverpsquotationClass::evercopycart($cart->id);
-        if (!$copycart) {
-            return false;
-        }
-        //Create new quotation object
-        $cartdetails = $cart->getSummaryDetails();
-        $cartproducts = $cart->getProducts(true);
+
+        // Get ever cart informations
+        $cart_details = $ever_cart->getSummaryDetails(
+            (int)$cart->id
+        );
+        $cart_products = $ever_cart->getProducts(
+            (int)$cart->id
+        );
+
+        // Now create quotation
         $quote = new EverpsquotationClass();
         $quote->reference = (string)Configuration::get('EVERPSQUOTATION_PREFIX');
         $quote->id_shop_group = (int)$cart->id_shop_group;
@@ -1157,104 +969,70 @@ class Everpsquotation extends PaymentModule
         $quote->id_address_invoice = (int)$cart->id_address_invoice;
         $quote->secure_key = (string)$cart->secure_key;
         $quote->recyclable = (int)$cart->recyclable;
-        $quote->total_discounts = (float)$cartdetails['total_discounts'];
-        $quote->total_discounts_tax_incl = (float)$cartdetails['total_discounts'];
-        $quote->total_discounts_tax_excl = (float)$cartdetails['total_discounts_tax_exc'];
-        $quote->total_paid_tax_incl = (float)$cartdetails['total_price'];
-        $quote->total_paid_tax_excl = (float)$cartdetails['total_price_without_tax'];
-        $quote->total_products = (float)$cartdetails['total_products'];
-        $quote->total_products_wt = (float)$cartdetails['total_products_wt'];
-        $quote->total_shipping = (float)$cartdetails['total_shipping'];
-        $quote->total_shipping_tax_incl = (float)$cartdetails['total_shipping'];
-        $quote->total_shipping_tax_excl = (float)$cartdetails['total_shipping_tax_exc'];
-        $quote->total_wrapping = (float)$cartdetails['total_wrapping'];
-        $quote->total_wrapping_tax_incl = (float)$cartdetails['total_wrapping'];
-        $quote->total_wrapping_tax_excl = (float)$cartdetails['total_wrapping_tax_exc'];
+        $quote->total_discounts = (float)$cart_details['total_discounts'];
+        $quote->total_discounts_tax_incl = (float)$cart_details['total_discounts'];
+        $quote->total_discounts_tax_excl = (float)$cart_details['total_discounts_tax_exc'];
+        $quote->total_paid_tax_incl = (float)$cart_details['total_price'];
+        $quote->total_paid_tax_excl = (float)$cart_details['total_price_without_tax'];
+        $quote->total_products = (float)$cart_details['total_products'];
+        $quote->total_products_wt = (float)$cart_details['total_products_wt'];
+        $quote->total_shipping = (float)$cart_details['total_shipping'];
+        $quote->total_shipping_tax_incl = (float)$cart_details['total_shipping'];
+        $quote->total_shipping_tax_excl = (float)$cart_details['total_shipping_tax_exc'];
+        $quote->total_wrapping = (float)$cart_details['total_wrapping'];
+        $quote->total_wrapping_tax_incl = (float)$cart_details['total_wrapping'];
+        $quote->total_wrapping_tax_excl = (float)$cart_details['total_wrapping_tax_exc'];
         $quote->valid = 0;
         $quote->date_add = $cart->date_add;
         $quote->date_upd = $cart->date_upd;
         $quote->save();
 
-        //Now create new Everpsquotationdetail object
-        foreach ($cartproducts as $cartproduct) {
+        // Add ever cart to quotation details
+        foreach ($cart_products as $cart_product) {
+            $product_stock = StockAvailable::getQuantityAvailableByProduct(
+                (int)$cart_product['id_product'],
+                (int)$cart_product['id_product_attribute']
+            );
+            $price_with_tax = Product::getPriceStatic(
+                (int)$cart_product['id_product'],
+                true,
+                (int)$cart_product['id_product_attribute']
+            );
+            $price_without_tax = Product::getPriceStatic(
+                (int)$cart_product['id_product'],
+                false,
+                (int)$cart_product['id_product_attribute']
+            );
+            $total_wt = (float)$price_with_tax * (int)$cart_product['cart_quantity'];
+            $total = (float)$price_without_tax * (int)$cart_product['cart_quantity'];
+            // $product_taxes = $price_with_tax - $price_without_tax;
+            // $total_product_taxes = $total_wt - $total;
+            // die(var_dump($price_without_tax));
             $quotedetail = new EverpsquotationDetail();
             $quotedetail->id_everpsquotation_quotes = (int)$quote->id;
-            $quotedetail->id_warehouse = $cartdetails['total_discounts']['id_warehouse'];
-            $quotedetail->id_shop = (int)$cartproduct['id_shop'];
-            $quotedetail->product_id = (int)$cartproduct['id_product'];
-            $quotedetail->product_attribute_id = (int)$cartproduct['id_product_attribute'];
-            $quotedetail->id_customization = (int)$cartproduct['id_customization'];
-            $quotedetail->product_name = (string)$cartproduct['name'];
-            $quotedetail->product_quantity = (int)$cartproduct['cart_quantity'];
-            $quotedetail->product_quantity_in_stock = (int)$cartproduct['stock_quantity'];
-            $quotedetail->product_price = $cartproduct['price'];
-            $quotedetail->product_ean13 = (string)$cartproduct['ean13'];
-            $quotedetail->product_isbn = (string)$cartproduct['isbn'];
-            $quotedetail->product_upc = (string)$cartproduct['upc'];
-            $quotedetail->product_reference = (string)$cartproduct['reference'];
-            $quotedetail->product_supplier_reference = (string)$cartproduct['supplier_reference'];
-            $quotedetail->product_weight = (float)$cartproduct['weight'];
-            $quotedetail->tax_name = (string)$cartproduct['tax_name'];
-            $quotedetail->ecotax = (float)$cartproduct['ecotax'];
-            $quotedetail->unit_price_tax_excl = (float)$cartproduct['price'];
-            $quotedetail->total_price_tax_incl = (float)$cartproduct['total_wt'];
-            $quotedetail->total_price_tax_excl = (float)$cartproduct['total'];
+            $quotedetail->id_warehouse = (int)$cart_details['total_discounts']['id_warehouse'];
+            $quotedetail->id_shop = (int)$cart_product['id_shop'];
+            $quotedetail->product_id = (int)$cart_product['id_product'];
+            $quotedetail->product_attribute_id = (int)$cart_product['id_product_attribute'];
+            $quotedetail->id_customization = (int)$cart_product['id_customization'];
+            $quotedetail->product_name = (string)$cart_product['name'];
+            $quotedetail->product_quantity = (int)$cart_product['cart_quantity'];
+            $quotedetail->product_quantity_in_stock = (int)$product_stock;
+            $quotedetail->product_price = (float)$price_without_tax;
+            $quotedetail->product_ean13 = (string)$cart_product['ean13'];
+            $quotedetail->product_isbn = (string)$cart_product['isbn'];
+            $quotedetail->product_upc = (string)$cart_product['upc'];
+            $quotedetail->product_reference = (string)$cart_product['reference'];
+            $quotedetail->product_supplier_reference = (string)$cart_product['supplier_reference'];
+            $quotedetail->product_weight = (float)$cart_product['weight'];
+            // $quotedetail->tax_name = (string)$cart_product['tax_name'];
+            $quotedetail->ecotax = (float)$cart_product['ecotax'];
+            $quotedetail->unit_price_tax_excl = (float)$price_without_tax;
+            $quotedetail->total_price_tax_incl = (float)$total_wt;
+            $quotedetail->total_price_tax_excl = (float)$total;
             $quotedetail->add();
         }
 
-        if (Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL')) {
-            $everShopEmail = Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL');
-        } else {
-            $everShopEmail = Configuration::get('PS_SHOP_EMAIL');
-        }
-        // Subject
-        $ever_subject = Configuration::getInt('EVERPSQUOTATION_MAIL_SUBJECT');
-        $subject = $ever_subject[(int)Context::getContext()->language->id];
-        // Filename
-        $filename = Configuration::getInt('EVERPSQUOTATION_FILENAME');
-        $ever_filename = $filename[(int)Context::getContext()->language->id];
-
-        $id_shop = (int)Context::getContext()->shop->id;
-        $mailDir = _PS_MODULE_DIR_.'everpsquotation/mails/';
-        $mailpdf = new PDF($quote->id, 'EverQuotationPdf', Context::getContext()->smarty);
-        $customer = new Customer(
-            (int)Context::getContext()->customer->id
-        );
-        $customerNames = $customer->firstname.' '.$customer->lastname;
-        $attachment = array();
-        $attachment['content'] = $mailpdf->render(false);
-        $attachment['name'] = $ever_filename;
-        $attachment['mime'] = 'application/pdf';
-
-        //Send customer email
-        $sent = Mail::send(
-            (int)Context::getContext()->language->id,
-            'everquotecustomer',
-            (string)$subject,
-            array(
-                '{shop_name}'=>Configuration::get('PS_SHOP_NAME'),
-                '{shop_logo}'=>_PS_IMG_DIR_.Configuration::get(
-                    'PS_LOGO',
-                    null,
-                    null,
-                    (int)$id_shop
-                ),
-                '{firstname}' => (string)$customer->firstname,
-                '{lastname}' => (string)$customer->lastname,
-            ),
-            (string)$customer->email,
-            (string)$customerNames,
-            (string)$everShopEmail,
-            Configuration::get('PS_SHOP_NAME'),
-            $attachment,
-            null,
-            $mailDir,
-            false,
-            null,
-            (string)$everShopEmail,
-            (string)$everShopEmail,
-            Configuration::get('PS_SHOP_NAME')
-        );
         // Render PDF for direct download
         $pdf = new PDF($quote->id, 'EverQuotationPdf', Context::getContext()->smarty);
         $pdf->render();

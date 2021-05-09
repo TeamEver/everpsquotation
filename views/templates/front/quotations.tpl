@@ -69,7 +69,7 @@
                     {/if}
             </td>
             <td align="right" class="details-{$value.id_everpsquotation_quotes|escape:'htmlall':'UTF-8'}" id="add_quote_to_cart">
-                <a href="{$link->getModuleLink('everpsquotation', 'quotations',['id_everpsquotation'=>$value.id_everpsquotation_quotes,'action'=>addtocart])|escape:'htmlall':'UTF-8'}" class="btn btn-success" role="button" data-idquote="{$value.id_everpsquotation_quotes}">
+                <a href="{$link->getModuleLink('everpsquotation', 'quotations',['id_everpsquotation'=>$value.id_everpsquotation_quotes,'action'=>addtocart])|escape:'htmlall':'UTF-8'}" class="btn btn-success" role="button" data-idquote="{$value.id_everpsquotation_quotes|escape:'htmlall':'UTF-8'}">
                     {l s='Add to cart' mod='everpsquotation'}
                     <i class="material-icons">shopping_basket</i>
                 </a>
@@ -86,5 +86,5 @@
     </div>
 </div>
 {/if}
-<a href="{$link->getPageLink('my-account', true)|escape:'html'}" title="{l s='Back to my account' mod='everpsquotation'}" class="account" rel="nofollow"><span>{l s='Back to my account' mod='everpsquotation'}</span></a>
+<a href="{$link->getPageLink('my-account', true)|escape:'htmlall':'UTF-8'}" title="{l s='Back to my account' mod='everpsquotation'}" class="account" rel="nofollow"><span>{l s='Back to my account' mod='everpsquotation'}</span></a>
 {/block}

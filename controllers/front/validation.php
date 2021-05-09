@@ -30,7 +30,6 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
     {
         $this->display_column_left = false;
         $this->display_column_right = false;
-        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         parent::init();
     }
 
@@ -63,12 +62,9 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             Tools::redirect('index.php?controller=order&step=1');
         }
 
-        $quotationcart = EverpsquotationClass::evercartexists((int)$cart->id); //What is it for ?
-        if (!$quotationcart) {
-            die($this->trans('An error has occured.', array(), 'Modules.Everpsquotation.Shop'));
-        }
-
-        $copycart = EverpsquotationClass::evercopycart($cart->id);
+        $copycart = EverpsquotationClass::copyCartToQuoteCart(
+            (int)$cart->id
+        );
         if (!$copycart) {
             die($this->trans('An error has occured.', array(), 'Modules.Everpsquotation.Shop'));
         }

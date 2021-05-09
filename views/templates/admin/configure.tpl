@@ -21,7 +21,7 @@
     <p>{l s='First, your products must be active, available for sale, with the price displayed.' mod='everpsquotation'}</p>
     <p>{l s='Products that are in unauthorized categories will also block the creation of quotes.' mod='everpsquotation'}</p>
     <p>{l s='Each customer must be connected and have an address to generate a quote.' mod='everpsquotation'}</p>
-    <p>{l s='Each customer must be connected and have an address to generate a quote.'}</p>
+    <p>{l s='Each customer must be connected and have an address to generate a quote.' mod='everpsquotation'}</p>
     <p>{l s='To activate the generation of quotes from the product page, rewritten URLs must be activated.' mod='everpsquotation'}</p>
     <p>{l s='Be sure to fill in the following contact information for your store:' mod='everpsquotation'}</p>
     <ul>

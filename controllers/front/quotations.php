@@ -53,8 +53,12 @@ class EverpsquotationQuotationsModuleFrontController extends ModuleFrontControll
         }
         if (Tools::getValue('id_everpsquotation') && Tools::getValue('action')) {
             $id_quote = (int)Tools::getValue('id_everpsquotation');
-            $quoteVerif = new EverpsquotationClass($id_quote);
-            if ($quoteVerif->id_customer == $cart->id_customer) {
+            $quote = new EverpsquotationClass(
+                (int)$id_quote
+            );
+            if (Validate::isLoadedObject($quote)
+                && $quote->id_customer == $cart->id_customer
+            ) {
                 switch (Tools::getValue('action')) {
                     case 'pdf':
                         $pdf = new PDF($id_quote, 'EverQuotationPdf', Context::getContext()->smarty);
@@ -66,7 +70,7 @@ class EverpsquotationQuotationsModuleFrontController extends ModuleFrontControll
                             (int)$this->context->shop->id,
                             (int)$this->context->language->id
                         );
-                        if (EverpsquotationClass::validateEverPsQuote($id_quote)) {
+                        if ($quote->validateEverPsQuote()) {
                             foreach ($products as $value) {
                                 $cart->updateQty(
                                     $value['product_quantity'],
@@ -92,7 +96,7 @@ class EverpsquotationQuotationsModuleFrontController extends ModuleFrontControll
                                 false
                             );
                         }
-                        if (!EverpsquotationClass::validateEverPsQuote($id_quote)) {
+                        if (!$quote->validateEverPsQuote()) {
                             Tools::redirect($_SERVER['PHP_SELF']);
                         }
                         break;
@@ -104,7 +108,7 @@ class EverpsquotationQuotationsModuleFrontController extends ModuleFrontControll
                 Tools::redirect(Link::getBaseLink($id_shop));
             }
         }
-        $quotationsList = EverpsquotationClass::getQuoteByIdCustomer($cart->id_customer);
+        $quotationsList = EverpsquotationClass::getQuotesByIdCustomer($cart->id_customer);
 
         $this->context->smarty->assign(array(
             'prefix' => Configuration::get('EVERPSQUOTATION_PREFIX'),

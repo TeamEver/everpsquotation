@@ -1,11 +1,20 @@
 <?php
-
 /**
- * Project : everpsquotation
- * @author Team Ever
- * @copyright Team Ever
- * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
- * @link http://team-ever.com
+ * 2019-2021 Team Ever
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ *  @author    Team Ever <https://www.team-ever.com/>
+ *  @copyright 2019-2021 Team Ever
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
 require_once _PS_MODULE_DIR_ . 'everpsquotation/models/EverpsquotationClass.php';
@@ -26,7 +35,8 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
         $text = Configuration::getInt('EVERPSQUOTATION_TEXT');
         $filename = Configuration::getInt('EVERPSQUOTATION_FILENAME');
         $this->text = $text[(int)Context::getContext()->language->id];
-        $this->filename = $filename[(int)Context::getContext()->language->id];
+        $this->filename = $filename[(int)Context::getContext()->language->id]
+        .$this->id_everpsquotation_quotes;
     }
 
     /**
@@ -46,10 +56,6 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
             $this->id_everpsquotation_quotes,
             Context::getContext()->shop->id,
             Context::getContext()->language->id
-
-        );
-        $cart = new Cart(
-            (int)$everpsquotation->id_cart
         );
         $customizations = array();
         foreach ($details as $detail) {

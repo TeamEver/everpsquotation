@@ -57,6 +57,7 @@ $_MODULE['<{everpsquotation}prestashop>admineverpsquotationcontroller_b718adec73
 $_MODULE['<{everpsquotation}prestashop>admineverpsquotationcontroller_ce26601dac0dea138b7295f02b7620a7'] = 'Client';
 $_MODULE['<{everpsquotation}prestashop>admineverpsquotationcontroller_1c76cbfe21c6f44c1d1e59d54f3e4420'] = 'Entreprise';
 $_MODULE['<{everpsquotation}prestashop>admineverpsquotationcontroller_96b0141273eabab320119c467cdcaf17'] = 'Total';
+$_MODULE['<{everpsquotation}prestashop>admineverpsquotationcontroller_f4e8b53a114e5a17d051ab84d326cae5'] = 'Total livraison';
 $_MODULE['<{everpsquotation}prestashop>admineverpsquotationcontroller_44749712dbec183e983dcd78a7736c41'] = 'Date';
 $_MODULE['<{everpsquotation}prestashop>admineverpsquotationcontroller_065ab3a28ca4f16f55f103adc7d0226f'] = 'Livraison';
 $_MODULE['<{everpsquotation}prestashop>admineverpsquotationcontroller_09e19149258b12c384de8bee722ddd32'] = 'Liste des devis';
@@ -85,7 +86,6 @@ $_MODULE['<{everpsquotation}prestashop>header_13162665ad376670e5396e5532e89352']
 $_MODULE['<{everpsquotation}prestashop>upgrade_11f4d2cc4546c08ed99645473ba29a5f'] = 'Une mise à jour est disponible sur notre boutique - Merci de vérifier';
 $_MODULE['<{everpsquotation}prestashop>upgrade_a43640b6c7cabe3d8d157aba85f7cee4'] = 'Pour avoir la dernière version de ce module';
 $_MODULE['<{everpsquotation}prestashop>myaccount_b423cfa40750b96c794447f27fa4cf87'] = 'Mes devis';
-$_MODULE['<{everpsquotation}prestashop>myaccount16_b423cfa40750b96c794447f27fa4cf87'] = 'Mes devis';
 $_MODULE['<{everpsquotation}prestashop>payment_infos_810d7cc33e3151b15ea3255b2d8757c7'] = 'Votre devis vous sera automatiquement envoyé par email';
 $_MODULE['<{everpsquotation}prestashop>quotations_b1405627a966efe94906b9a67ffba897'] = 'Voici une liste de vos devis';
 $_MODULE['<{everpsquotation}prestashop>quotations_68705eec5d52b1589acfc48e9f14d577'] = 'Vous pouvez commande à n\'importe quel moment sur notre site';
@@ -100,18 +100,6 @@ $_MODULE['<{everpsquotation}prestashop>quotations_3ac705f2acd51a4613f9188c05c91d
 $_MODULE['<{everpsquotation}prestashop>quotations_ad3d06d03d94223fa652babc913de686'] = 'Valider';
 $_MODULE['<{everpsquotation}prestashop>quotations_34e91c176592ac1602659feb7b2746c6'] = 'Il n\'y a pas encore de devis sur votre compte !';
 $_MODULE['<{everpsquotation}prestashop>quotations_122e15ccab4135a2786937a24b11e5e9'] = 'Retour à mon compte';
-$_MODULE['<{everpsquotation}prestashop>quotations16_b1405627a966efe94906b9a67ffba897'] = 'Voici une liste de vos devis';
-$_MODULE['<{everpsquotation}prestashop>quotations16_68705eec5d52b1589acfc48e9f14d577'] = 'Vous pouvez commander dès que vous le souhaitez sur notre site';
-$_MODULE['<{everpsquotation}prestashop>quotations16_ac106e2f8b81f359fc4798d8dcb1e0ea'] = 'N\'hésitez pas à nous contacter par téléphone à ';
-$_MODULE['<{everpsquotation}prestashop>quotations16_7e6d1eefa1678657cd57b1aadcfa5edf'] = 'ou par email à ';
-$_MODULE['<{everpsquotation}prestashop>quotations16_10b599fca5f2bc272a0b5cbbac104b24'] = 'Téléchargement';
-$_MODULE['<{everpsquotation}prestashop>quotations16_3112209b2dd9b55cf5dbc4865dd15afd'] = 'Date de création';
-$_MODULE['<{everpsquotation}prestashop>quotations16_e96615009614641cd23c37386de397a9'] = 'Total TTC';
-$_MODULE['<{everpsquotation}prestashop>quotations16_31c1e2119e2639fff88f4be5e8986f6d'] = 'Valider';
-$_MODULE['<{everpsquotation}prestashop>quotations16_2d0f6b8300be19cf35e89e66f0677f95'] = 'Ajouter au panier';
-$_MODULE['<{everpsquotation}prestashop>quotations16_3ac705f2acd51a4613f9188c05c91d0d'] = 'Valide';
-$_MODULE['<{everpsquotation}prestashop>quotations16_ad3d06d03d94223fa652babc913de686'] = 'Valider';
-$_MODULE['<{everpsquotation}prestashop>quotations16_34e91c176592ac1602659feb7b2746c6'] = 'Il n\'y a pas encore de devis sur votre compte !';
 $_MODULE['<{everpsquotation}prestashop>quotation_added_8e2cff5cc9806020faa59272709a1482'] = 'Votre devis vous a bien été envoyé par email';
 $_MODULE['<{everpsquotation}prestashop>quotation_added_6b61ee69a72d5edb0d566356a8ca8a72'] = 'Vous pouvez commander à n\'importe quel moment sur notre site ou retrouver vos devis sur votre compte client';
 $_MODULE['<{everpsquotation}prestashop>quotation_added_ac106e2f8b81f359fc4798d8dcb1e0ea'] = 'N\'hésitez pas nous contacter par téléphone à ';
@@ -125,9 +113,7 @@ $_MODULE['<{everpsquotation}prestashop>everquotation_content_962d4b43efc6d1be666
 $_MODULE['<{everpsquotation}prestashop>everquotation_content_018f79838f50562f8db3150ddc19c8be'] = 'Total produit HT';
 $_MODULE['<{everpsquotation}prestashop>everquotation_content_c2d3e7b895c3f3a58c433f797249c834'] = 'Personnalisation';
 $_MODULE['<{everpsquotation}prestashop>everquotation_content_02776e656ab308a7d5c721d3cfa9db67'] = 'Total produits HT';
-$_MODULE['<{everpsquotation}prestashop>everquotation_content_b33f4501cb6ee5f1f4a9473959356040'] = 'Total livraison HT';
-$_MODULE['<{everpsquotation}prestashop>everquotation_content_71111bc51a0203e587017ac9da96b8d7'] = 'Total réductions HT';
-$_MODULE['<{everpsquotation}prestashop>everquotation_content_bef07a568bb162313a8aad2b76bb4a65'] = 'Total HT';
+$_MODULE['<{everpsquotation}prestashop>everquotation_content_91e05c58d3dd541399e15c186aa599f6'] = 'Total livraison';
 $_MODULE['<{everpsquotation}prestashop>everquotation_content_7bf753e0cbb2d38818ba2a3ee3b36f4d'] = 'Total taxes';
 $_MODULE['<{everpsquotation}prestashop>everquotation_content_f617c53a5521d2c3be8cd30653e76ee3'] = 'Total TTC';
 $_MODULE['<{everpsquotation}prestashop>everquotation_header_73015b3208cdee70a4497235463b63d7'] = 'Devis';
