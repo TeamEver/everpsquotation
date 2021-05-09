@@ -16,6 +16,7 @@
  *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
+use PrestaShop\PrestaShop\Adapter\ServiceLocator;
 
 class EverpsquotationCart extends ObjectModel
 {
@@ -262,10 +263,15 @@ class EverpsquotationCart extends ObjectModel
                 $reduction = (!Product::getTaxCalculationMethod()
                     ? (float) $product['price_wt']
                     : (float) $product['price']) - (float) $product['price_without_quantity_discount'];
-                $product['reduction_formatted'] = Tools::getContextLocale($context)->formatPrice(
-                    $reduction,
-                    $context->currency->iso_code
-                );
+
+                if (Tools::version_compare(_PS_VERSION_, '1.7.7.1', '<') === true) {
+                    $product['reduction_formatted'] = Tools::displayPrice($reduction);
+                } else {
+                    $product['reduction_formatted'] = Tools::getContextLocale($context)->formatPrice(
+                        $reduction,
+                        $context->currency->iso_code
+                    );
+                }
             }
         }
 
@@ -391,7 +397,6 @@ class EverpsquotationCart extends ObjectModel
                 IF (IFNULL(pa.`ean13`, \'\') = \'\', p.`ean13`, pa.`ean13`) AS ean13,
                 IF (IFNULL(pa.`isbn`, \'\') = \'\', p.`isbn`, pa.`isbn`) AS isbn,
                 IF (IFNULL(pa.`upc`, \'\') = \'\', p.`upc`, pa.`upc`) AS upc,
-                IF (IFNULL(pa.`mpn`, \'\') = \'\', p.`mpn`, pa.`mpn`) AS mpn,
                 IFNULL(product_attribute_shop.`minimal_quantity`, product_shop.`minimal_quantity`) as minimal_quantity,
                 IF(
                     product_attribute_shop.wholesale_price > 0,
@@ -414,7 +419,7 @@ class EverpsquotationCart extends ObjectModel
         } else {
             $sql->select(
                 'p.`reference` AS reference, p.`ean13`, p.`isbn`,
-                p.`upc` AS upc, p.`mpn` AS mpn,
+                p.`upc` AS upc,
                 product_shop.`minimal_quantity` AS minimal_quantity,
                 product_shop.`wholesale_price` wholesale_price'
             );
@@ -518,7 +523,7 @@ class EverpsquotationCart extends ObjectModel
         $type = Cart::BOTH,
         $products = null,
         $id_carrier = null,
-        bool $keepOrderPrices = false
+        $keepOrderPrices = false
     ) {
         $cart = new Cart(
             (int)Context::getContext()->cart->id
@@ -574,7 +579,13 @@ class EverpsquotationCart extends ObjectModel
 
         // CART CALCULATION
         $cartRules = [];
-        $computePrecision = Context::getContext()->getComputingPrecision();
+        // Compute precision has been moved
+        if (Tools::version_compare(_PS_VERSION_, '1.7.7.1', '<') === true) {
+            $configuration = ServiceLocator::get('\\PrestaShop\\PrestaShop\\Core\\ConfigurationInterface');
+            $computePrecision = $configuration->get('_PS_PRICE_COMPUTE_PRECISION_');
+        } else {
+            $computePrecision = Context::getContext()->getComputingPrecision();
+        }
         $calculator = $cart->newCalculator($products, $cartRules, $id_carrier, $computePrecision, $keepOrderPrices);
         switch ($type) {
             case Cart::ONLY_SHIPPING:
