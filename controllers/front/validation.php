@@ -57,11 +57,15 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             null,
             true
         );
+        if ($total_cart <= 0) {
+            Tools::redirect('index.php?controller=order&step=1');
+        }
         if ((float)Configuration::get('EVERPSQUOTATION_MIN_AMOUNT') > 0
             && $total_cart < Configuration::get('EVERPSQUOTATION_MIN_AMOUNT')) {
             Tools::redirect('index.php?controller=order&step=1');
         }
 
+        Hook::exec('actionBeforeCreateEverQuote');
         $id_quote_cart = EverpsquotationCart::copyCartToQuoteCart(
             (int)$cart->id
         );
@@ -130,6 +134,7 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             $quotedetail->total_price_tax_excl = (float)$cartproduct['total'];
             $quotedetail->add();
         }
+        Hook::exec('actionAfterCreateEverQuote');
 
         //Preparing emails
         if (Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL')) {
@@ -181,6 +186,10 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             (string)$everShopEmail,
             Configuration::get('PS_SHOP_NAME')
         );
+        // Comment below to show quotation added template
+        $pdf = new PDF($quote->id, 'EverQuotationPdf', Context::getContext()->smarty);
+        $pdf->render();
+        // These lines won't work until previous PDF rendering  code is not commented
         $my_quotations_link = Context::getContext()->link->getModuleLink(
             'everpsquotation',
             'quotations',
@@ -193,5 +202,40 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             'shop_email' => Configuration::get('PS_SHOP_EMAIL', null, null, (int)$id_shop),
         ));
         $this->setTemplate('module:everpsquotation/views/templates/front/quotation_added.tpl');
+    }
+
+    public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
+    {
+        if ($this->isSeven) {
+            return Context::getContext()->getTranslator()->trans(
+                $string,
+                [],
+                'Modules.Everpsquotation.quotations'
+            );
+        }
+
+        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
+    }
+
+    public function getBreadcrumbLinks()
+    {
+        $breadcrumb = parent::getBreadcrumbLinks();
+        $breadcrumb['links'][] = $this->addMyAccountToBreadcrumb();
+        $breadcrumb['links'][] = array(
+            'title' => $this->l('Quotation saved'),
+            'url' => $this->context->link->getModuleLink(
+                'everpsquotation',
+                'validation'
+            ),
+        );
+        return $breadcrumb;
+    }
+
+    public function getTemplateVarPage()
+    {
+        $page = parent::getTemplateVarPage();
+        $page['body_classes']['page-everpsquotation'] = true;
+        $page['body_classes']['page-everpsquotation-validation'] = true;
+        return $page;
     }
 }

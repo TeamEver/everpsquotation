@@ -41,7 +41,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '3.1.4';
+        $this->version = '3.1.5';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -74,14 +74,65 @@ class Everpsquotation extends PaymentModule
             }
         }
         return (parent::install()
+            && $this->checkHooks()
+            && $this->installModuleTab('AdminEverPsQuotation'));
+    }
+
+    public function checkHooks()
+    {
+        return ($this->createQuoteHooks()
             && $this->registerHook('header')
+            && $this->registerHook('actionBeforeCreateEverQuote')
+            && $this->registerHook('actionAfterCreateEverQuote')
             && $this->registerHook('displayCustomerAccount')
             && $this->registerHook('displayShoppingCart')
-            && $this->registerHook('LeftColumn')
-            && $this->registerHook('RightColumn')
             && $this->registerHook('displayReassurance')
             && $this->registerHook('paymentOptions')
-            && $this->installModuleTab('AdminEverPsQuotation'));
+            && $this->registerHook('displayCartModalFooter'));
+    }
+
+    public function createQuoteHooks()
+    {
+        $result = true;
+        // Hook before quote creation
+        if (!Hook::getIdByName('actionBeforeCreateEverQuote')) {
+            $hook = new Hook();
+            $hook->name = 'actionBeforeCreateEverQuote';
+            $hook->title = 'Before quotation creation';
+            $hook->description = 'This hook is triggered before quote is created';
+            $result &= $hook->save();
+        }
+        // Hook after quote creation
+        if (!Hook::getIdByName('actionAfterCreateEverQuote')) {
+            $hook = new Hook();
+            $hook->name = 'actionAfterCreateEverQuote';
+            $hook->title = 'After quotation creation';
+            $hook->description = 'This hook is triggered after quote is created';
+            $result &= $hook->save();
+        }
+        return $result;
+    }
+
+    public function deleteQuoteHooks()
+    {
+        $result = true;
+        // Hook before quote creation
+        $actionBeforeCreateEverQuote = Hook::getIdByName('actionBeforeCreateEverQuote');
+        if ($actionBeforeCreateEverQuote) {
+            $hook = new Hook(
+                (int)$actionBeforeCreateEverQuote
+            );
+            $result &= $hook->delete();
+        }
+        // Hook after quote creation
+        $actionAfterCreateEverQuote = Hook::getIdByName('actionAfterCreateEverQuote');
+        if ($actionAfterCreateEverQuote) {
+            $hook = new Hook(
+                (int)$actionAfterCreateEverQuote
+            );
+            $result &= $hook->delete();
+        }
+        return $result;
     }
 
     /**
@@ -101,6 +152,11 @@ class Everpsquotation extends PaymentModule
                 }
             }
         }
+        $this->deleteQuoteHooks();
+        Db::getInstance()->delete(
+            'hook_module',
+            'id_module = '.(int)$this->id
+        );
 
         return (parent::uninstall()
             && Configuration::deleteByName('EVERPSQUOTATION_ACCOUNT_EMAIL')
@@ -150,6 +206,7 @@ class Everpsquotation extends PaymentModule
      */
     public function getContent()
     {
+        $this->checkHooks();
         if (Tools::isSubmit('submitEverpsquotationModule')) {
             $this->postValidation();
 
@@ -748,6 +805,26 @@ class Everpsquotation extends PaymentModule
         }
     }
 
+    public function hookDisplayShoppingCartFooter()
+    {
+        return $this->hookDisplayShoppingCart();
+    }
+
+    public function hookDisplayCartModalFooter()
+    {
+        return $this->hookDisplayShoppingCart();
+    }
+
+    public function hookDisplayLeftColumn()
+    {
+        return $this->hookDisplayShoppingCart();
+    }
+
+    public function hookDisplayRightColumn()
+    {
+        return $this->hookDisplayShoppingCart();
+    }
+
     public function hookDisplayShoppingCart()
     {
         $total_cart = $this->context->cart->getOrderTotal(
@@ -757,6 +834,9 @@ class Everpsquotation extends PaymentModule
             null,
             true
         );
+        if ($total_cart <= 0) {
+            return;
+        }
         if ((float)Configuration::get('EVERPSQUOTATION_MIN_AMOUNT') > 0
             && $total_cart < Configuration::get('EVERPSQUOTATION_MIN_AMOUNT')) {
             return;
@@ -820,6 +900,12 @@ class Everpsquotation extends PaymentModule
         $product = new Product(
             (int)Tools::getValue('id_product')
         );
+        if ($product->visibility == 'none'
+            || (bool)$product->available_for_order === false
+            || (bool)$product->show_price === false
+        ) {
+            return;
+        }
         if ((float)Configuration::get('EVERPSQUOTATION_MIN_AMOUNT') > 0
             && $product->price < Configuration::get('EVERPSQUOTATION_MIN_AMOUNT')) {
             return;
@@ -836,7 +922,6 @@ class Everpsquotation extends PaymentModule
             array(),
             true
         );
-
         if (!in_array($product->id_category_default, $selected_cat)
             || !Configuration::get('PS_REWRITING_SETTINGS')
         ) {
@@ -848,7 +933,6 @@ class Everpsquotation extends PaymentModule
             } else {
                 $catalogMode = false;
             }
-
             $this->context->smarty->assign(array(
                 'my_quotations_link' => $my_quotations_link,
                 'cart_url' => $link->getPageLink('cart', true),
@@ -869,12 +953,6 @@ class Everpsquotation extends PaymentModule
             ) {
                 return;
             }
-            if ($product->visibility == 'none'
-                || (bool)$product->available_for_order === false
-                || (bool)$product->show_price === false
-            ) {
-                return;
-            }
             if (!$address) {
                 return $this->display(__FILE__, 'views/templates/hook/noaddress.tpl');
             } else {
@@ -884,11 +962,6 @@ class Everpsquotation extends PaymentModule
     }
 
     public function hookDisplayProductExtraContent()
-    {
-        return $this->hookDisplayReassurance();
-    }
-
-    public function hookDisplayShoppingCartFooter()
     {
         return $this->hookDisplayReassurance();
     }
@@ -932,6 +1005,7 @@ class Everpsquotation extends PaymentModule
     private function createSimpleProductQuote($id_product, $id_product_attribute, $id_customization, $qty)
     {
         $cart = Context::getContext()->cart;
+        Hook::exec('actionBeforeCreateEverQuote');
 
         // First create Quote Cart
         $ever_cart = new EverpsquotationCart();
@@ -1045,6 +1119,7 @@ class Everpsquotation extends PaymentModule
             $quotedetail->total_price_tax_excl = (float)$total;
             $quotedetail->add();
         }
+        Hook::exec('actionAfterCreateEverQuote');
         
         //Preparing emails
         if (Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL')) {

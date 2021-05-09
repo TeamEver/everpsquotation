@@ -144,9 +144,17 @@ class EverpsquotationQuotationsModuleFrontController extends ModuleFrontControll
             'title' => $this->l('My quotations'),
             'url' => $this->context->link->getModuleLink(
                 'everpsquotation',
-                $this->l('quotations')
+                'quotations'
             ),
         );
         return $breadcrumb;
+    }
+
+    public function getTemplateVarPage()
+    {
+        $page = parent::getTemplateVarPage();
+        $page['body_classes']['page-everpsquotation'] = true;
+        $page['body_classes']['page-everpsquotation-quotations'] = true;
+        return $page;
     }
 }
