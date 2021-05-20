@@ -206,15 +206,11 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
     {
-        if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans(
-                $string,
-                [],
-                'Modules.Everpsquotation.quotations'
-            );
-        }
-
-        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
+        return Context::getContext()->getTranslator()->trans(
+            $string,
+            [],
+            'Modules.Everpsquotation.quotations'
+        );
     }
 
     public function getBreadcrumbLinks()
