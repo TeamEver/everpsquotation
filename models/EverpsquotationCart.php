@@ -230,7 +230,7 @@ class EverpsquotationCart extends ObjectModel
     {
         $sql = new DbQuery();
         $sql->select(
-            'qty'
+            'quantity'
         );
         $sql->from(
             'everpsquotation_cart_product'

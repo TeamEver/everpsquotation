@@ -41,7 +41,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '3.1.7';
+        $this->version = '3.2.1';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -674,7 +674,7 @@ class Everpsquotation extends PaymentModule
         return array(
             'EVERPSQUOTATION_CATEGORIES' => Tools::getValue(
                 'EVERPSQUOTATION_CATEGORIES',
-                Tools::jsonDecode(
+                json_decode(
                     Configuration::get(
                         'EVERPSQUOTATION_CATEGORIES'
                     )
@@ -682,7 +682,7 @@ class Everpsquotation extends PaymentModule
             ),
             'EVERPSQUOTATION_GROUPS[]' => Tools::getValue(
                 'EVERPSQUOTATION_GROUPS',
-                Tools::jsonDecode(
+                json_decode(
                     Configuration::get(
                         'EVERPSQUOTATION_GROUPS',
                         (int)$this->context->language->id
@@ -1015,7 +1015,7 @@ class Everpsquotation extends PaymentModule
 
     private function getAllowedCategories()
     {
-        $selected_cat = Tools::jsonDecode(
+        $selected_cat = json_decode(
             Configuration::get(
                 'EVERPSQUOTATION_CATEGORIES'
             )
@@ -1028,7 +1028,7 @@ class Everpsquotation extends PaymentModule
 
     private function getAllowedGroups()
     {
-        $allowed_groups = Tools::jsonDecode(
+        $allowed_groups = json_decode(
             Configuration::get(
                 'EVERPSQUOTATION_GROUPS'
             )
