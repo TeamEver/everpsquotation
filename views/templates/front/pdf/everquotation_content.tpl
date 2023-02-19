@@ -227,6 +227,17 @@
                 {convertPrice price=$total_shipping_tax_excl}
             </td>
         </tr>
+        {if isset($total_discounts_tax_incl) && $total_discounts_tax_incl > 0}
+        <tr>
+            <td colspan="3"></td>
+            <td align="right" style="margin:0; background-color: #414040;color:white">
+                {l s='Total discounts' mod='everpsquotation'}
+            </td>
+            <td align="right" style=" border-right:0.5px solid #414040;">
+                {convertPrice price=$total_discounts_tax_incl}
+            </td>
+        </tr>
+        {/if}
         <tr>
             <td colspan="3"></td>
             <td align="right" style="margin:0; background-color: #414040;color:white">
