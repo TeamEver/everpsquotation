@@ -32,8 +32,8 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
         $this->context = Context::getContext();
         $this->shop = new Shop(Context::getContext()->shop->id);
         $this->lang = new Language((int)Context::getContext()->language->id);
-        $text = Configuration::getInt('EVERPSQUOTATION_TEXT');
-        $filename = Configuration::getInt('EVERPSQUOTATION_FILENAME');
+        $text = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_TEXT');
+        $filename = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_FILENAME');
         $this->text = $text[(int)Context::getContext()->language->id];
         $this->filename = $filename[(int)Context::getContext()->language->id]
         .$this->id_everpsquotation_quotes;

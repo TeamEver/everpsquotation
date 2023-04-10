@@ -144,10 +144,10 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
         }
 
         // Subject
-        $ever_subject = Configuration::getInt('EVERPSQUOTATION_MAIL_SUBJECT');
+        $ever_subject = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_MAIL_SUBJECT');
         $subject = $ever_subject[(int)Context::getContext()->language->id];
         // Filename
-        $filename = Configuration::getInt('EVERPSQUOTATION_FILENAME');
+        $filename = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_FILENAME');
         $ever_filename = $filename[(int)Context::getContext()->language->id];
 
         $id_shop = (int)Context::getContext()->shop->id;

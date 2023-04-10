@@ -41,7 +41,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '3.3.1';
+        $this->version = '4.0.1';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -51,7 +51,7 @@ class Everpsquotation extends PaymentModule
         $this->displayName = $this->l('Ever PS Quotation');
         $this->description = $this->l('Simply accept quotations on your Prestashop !');
         $this->confirmUninstall = $this->l('Do you REALLY want to uninstall this awesome module ?');
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
     }
 
     /**
@@ -82,8 +82,6 @@ class Everpsquotation extends PaymentModule
     {
         return ($this->createQuoteHooks()
             && $this->registerHook('header')
-            && $this->registerHook('actionBeforeCreateEverQuote')
-            && $this->registerHook('actionAfterCreateEverQuote')
             && $this->registerHook('displayCustomerAccount')
             && $this->registerHook('displayShoppingCart')
             && $this->registerHook('displayReassurance')
@@ -590,13 +588,13 @@ class Everpsquotation extends PaymentModule
 
         Configuration::updateValue(
             'EVERPSQUOTATION_CATEGORIES',
-            Tools::jsonEncode(Tools::getValue('EVERPSQUOTATION_CATEGORIES')),
+            json_encode(Tools::getValue('EVERPSQUOTATION_CATEGORIES')),
             true
         );
 
         Configuration::updateValue(
             'EVERPSQUOTATION_GROUPS',
-            Tools::jsonEncode(Tools::getValue('EVERPSQUOTATION_GROUPS')),
+            json_encode(Tools::getValue('EVERPSQUOTATION_GROUPS')),
             true
         );
 
@@ -650,27 +648,6 @@ class Everpsquotation extends PaymentModule
      */
     protected function getConfigFormValues()
     {
-        $everpsquotation_subject = array();
-        $everpsquotation_filename = array();
-        $everpsquotation_text = array();
-        foreach (Language::getLanguages(false) as $lang) {
-            $everpsquotation_subject[$lang['id_lang']] = (Tools::getValue(
-                'EVERPSQUOTATION_MAIL_SUBJECT_'.$lang['id_lang']
-            )) ? Tools::getValue(
-                'EVERPSQUOTATION_MAIL_SUBJECT_'.$lang['id_lang']
-            ) : '';
-            $everpsquotation_filename[$lang['id_lang']] = (Tools::getValue(
-                'EVERPSQUOTATION_FILENAME_'.$lang['id_lang']
-            )) ? Tools::getValue(
-                'EVERPSQUOTATION_FILENAME_'.$lang['id_lang']
-            ) : '';
-            $everpsquotation_text[$lang['id_lang']] = (Tools::getValue(
-                'EVERPSQUOTATION_TEXT_'.$lang['id_lang']
-            )) ? Tools::getValue(
-                'EVERPSQUOTATION_TEXT_'.$lang['id_lang']
-            ) : '';
-        }
-
         return array(
             'EVERPSQUOTATION_CATEGORIES' => Tools::getValue(
                 'EVERPSQUOTATION_CATEGORIES',
@@ -733,19 +710,13 @@ class Everpsquotation extends PaymentModule
                     'EVERPSQUOTATION_RENDER_ON_VALIDATION'
                 )
             ),            
-            'EVERPSQUOTATION_MAIL_SUBJECT' => (!empty(
-                $everpsquotation_subject[(int)Configuration::get('PS_LANG_DEFAULT')]
-            )) ? $everpsquotation_subject : Configuration::getInt(
+            'EVERPSQUOTATION_MAIL_SUBJECT' => Configuration::getConfigInMultipleLangs(
                 'EVERPSQUOTATION_MAIL_SUBJECT'
             ),
-            'EVERPSQUOTATION_FILENAME' => (!empty(
-                $everpsquotation_filename[(int)Configuration::get('PS_LANG_DEFAULT')]
-            )) ? $everpsquotation_filename : Configuration::getInt(
+            'EVERPSQUOTATION_FILENAME' => Configuration::getConfigInMultipleLangs(
                 'EVERPSQUOTATION_FILENAME'
             ),
-            'EVERPSQUOTATION_TEXT' => (!empty(
-                $everpsquotation_text[(int)Configuration::get('PS_LANG_DEFAULT')]
-            )) ? $everpsquotation_text : Configuration::getInt(
+            'EVERPSQUOTATION_TEXT' => Configuration::getConfigInMultipleLangs(
                 'EVERPSQUOTATION_TEXT'
             ),
         );
@@ -1134,7 +1105,7 @@ class Everpsquotation extends PaymentModule
             // die(var_dump($price_without_tax));
             $quotedetail = new EverpsquotationDetail();
             $quotedetail->id_everpsquotation_quotes = (int)$quote->id;
-            $quotedetail->id_warehouse = (int)$cart_details['total_discounts']['id_warehouse'];
+            // $quotedetail->id_warehouse = (int)$cart_details['total_discounts']['id_warehouse'];
             $quotedetail->id_shop = (int)$cart_product['id_shop'];
             $quotedetail->product_id = (int)$cart_product['id_product'];
             $quotedetail->product_attribute_id = (int)$cart_product['id_product_attribute'];
@@ -1166,10 +1137,10 @@ class Everpsquotation extends PaymentModule
         }
 
         // Subject
-        $ever_subject = Configuration::getInt('EVERPSQUOTATION_MAIL_SUBJECT');
+        $ever_subject = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_MAIL_SUBJECT');
         $subject = $ever_subject[(int)Context::getContext()->language->id];
         // Filename
-        $filename = Configuration::getInt('EVERPSQUOTATION_FILENAME');
+        $filename = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_FILENAME');
         $ever_filename = $filename[(int)Context::getContext()->language->id];
 
         $id_shop = (int)Context::getContext()->shop->id;
