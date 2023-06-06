@@ -32,7 +32,7 @@
         <p class="alert alert-info">
             {l s='Do you need more functions for your quotes on your shop ?' mod='everpsquotation'}
             <br>
-            <a href="https://www.store-opart.fr/p/25-devis.html#ae35-4" target="_blank">{l s='Have a look on our partner module, you will be able to create quotes from your back-office !' mod='everpsquotation'}</a>
+            <a href="https://www.store-opart.fr/?opaffi=527bc8ee40" target="_blank">{l s='Have a look on our partner module, you will be able to create quotes from your back-office !' mod='everpsquotation'}</a>
         </p>
         {if isset($moduleConfUrl) && $moduleConfUrl}
         <a href="{$moduleConfUrl|escape:'htmlall':'UTF-8'}" class="btn btn-success">{l s='Direct link to module configuration' mod='everpsquotation'}</a>
