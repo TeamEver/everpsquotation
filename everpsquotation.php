@@ -41,7 +41,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '4.0.1';
+        $this->version = '4.0.2';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -73,6 +73,7 @@ class Everpsquotation extends PaymentModule
                 return false;
             }
         }
+        $this->createQuoteHooks();
         return (parent::install()
             && $this->checkHooks()
             && $this->installModuleTab('AdminEverPsQuotation'));
@@ -80,8 +81,7 @@ class Everpsquotation extends PaymentModule
 
     public function checkHooks()
     {
-        return ($this->createQuoteHooks()
-            && $this->registerHook('header')
+        return ($this->registerHook('header')
             && $this->registerHook('displayCustomerAccount')
             && $this->registerHook('displayShoppingCart')
             && $this->registerHook('displayReassurance')
@@ -204,7 +204,6 @@ class Everpsquotation extends PaymentModule
      */
     public function getContent()
     {
-        $this->checkHooks();
         if (Tools::isSubmit('submitEverpsquotationModule')) {
             $this->postValidation();
 
@@ -710,13 +709,13 @@ class Everpsquotation extends PaymentModule
                     'EVERPSQUOTATION_RENDER_ON_VALIDATION'
                 )
             ),            
-            'EVERPSQUOTATION_MAIL_SUBJECT' => Configuration::getConfigInMultipleLangs(
+            'EVERPSQUOTATION_MAIL_SUBJECT' => self::getConfigInMultipleLangs(
                 'EVERPSQUOTATION_MAIL_SUBJECT'
             ),
-            'EVERPSQUOTATION_FILENAME' => Configuration::getConfigInMultipleLangs(
+            'EVERPSQUOTATION_FILENAME' => self::getConfigInMultipleLangs(
                 'EVERPSQUOTATION_FILENAME'
             ),
-            'EVERPSQUOTATION_TEXT' => Configuration::getConfigInMultipleLangs(
+            'EVERPSQUOTATION_TEXT' => self::getConfigInMultipleLangs(
                 'EVERPSQUOTATION_TEXT'
             ),
         );
@@ -1137,10 +1136,10 @@ class Everpsquotation extends PaymentModule
         }
 
         // Subject
-        $ever_subject = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_MAIL_SUBJECT');
+        $ever_subject = self::getConfigInMultipleLangs('EVERPSQUOTATION_MAIL_SUBJECT');
         $subject = $ever_subject[(int)Context::getContext()->language->id];
         // Filename
-        $filename = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_FILENAME');
+        $filename = self::getConfigInMultipleLangs('EVERPSQUOTATION_FILENAME');
         $ever_filename = $filename[(int)Context::getContext()->language->id];
 
         $id_shop = (int)Context::getContext()->shop->id;
@@ -1192,20 +1191,35 @@ class Everpsquotation extends PaymentModule
         .$module
         .'&version='
         .$version;
-        $handle = curl_init($upgrade_link);
-        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-        curl_exec($handle);
-        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        curl_close($handle);
-        if ($httpCode != 200) {
+        try {
+            $handle = curl_init($upgrade_link);
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+            curl_exec($handle);
+            $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+            curl_close($handle);
+            if ($httpCode != 200) {
+                return false;
+            }
+            $module_version = Tools::file_get_contents(
+                $upgrade_link
+            );
+            if ($module_version && $module_version > $version) {
+                return true;
+            }
+            return false;
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog('Unable to check Team Ever module upgrade');
             return false;
         }
-        $module_version = Tools::file_get_contents(
-            $upgrade_link
-        );
-        if ($module_version && $module_version > $version) {
-            return true;
+    }
+
+    public static function getConfigInMultipleLangs($key, $idShopGroup = null, $idShop = null)
+    {
+        $resultsArray = [];
+        foreach (Language::getIDs() as $idLang) {
+            $resultsArray[$idLang] = Configuration::get($key, $idLang, $idShopGroup, $idShop);
         }
-        return false;
+
+        return $resultsArray;
     }
 }

@@ -17,7 +17,7 @@
 *}
 
 <div class="panel" id="admineverfooter">
-    <h3><i class="icon icon-credit-card"></i> {l s='Ever Quotations' mod='everpsquotation'}</h3>
+    <h3><i class="icon icon-smile"></i> {l s='Ever Quotations' mod='everpsquotation'}</h3>
     <a href="#admineverheader">
         <img id="everlogo" src="{$everpsquotation_dir|escape:'htmlall':'UTF-8'}/logo.png" style="max-width: 120px;">
     </a>

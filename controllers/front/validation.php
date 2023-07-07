@@ -144,10 +144,10 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
         }
 
         // Subject
-        $ever_subject = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_MAIL_SUBJECT');
+        $ever_subject = $this->module::getConfigInMultipleLangs('EVERPSQUOTATION_MAIL_SUBJECT');
         $subject = $ever_subject[(int)Context::getContext()->language->id];
         // Filename
-        $filename = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_FILENAME');
+        $filename = $this->module::getConfigInMultipleLangs('EVERPSQUOTATION_FILENAME');
         $ever_filename = $filename[(int)Context::getContext()->language->id];
 
         $id_shop = (int)Context::getContext()->shop->id;
@@ -163,7 +163,7 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
             'everquotecustomer',
             (string)$subject,
             array(
-                '{shop_name}'=>Configuration::get('PS_SHOP_NAME'),
+                '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
                 '{shop_logo}'=>_PS_IMG_DIR_.Configuration::get(
                     'PS_LOGO',
                     null,
