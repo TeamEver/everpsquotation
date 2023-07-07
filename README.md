@@ -4,7 +4,7 @@ Allow customers to create quotations on Prestashop 1.7 & 8
 
 [https://www.team-ever.com/prestashop-1-7-module-de-devis-gratuit/](https://www.team-ever.com/prestashop-1-7-module-de-devis-gratuit/)
 
-## Prestashop 1.7 free quotation module
+## Prestashop 1.7 & 8 free quotation module
 This free module allows customers to create quotations on Prestashop 1.7 & 8
 
 [You can make a donation to support the development of free modules by clicking on this link](https://www.paypal.com/donate?hosted_button_id=3CM3XREMKTMSE)
