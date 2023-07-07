@@ -42,7 +42,6 @@ class AdminEverPsQuotationController extends ModuleAdminController
         $this->className = 'EverpsquotationClass';
         $this->identifier = 'id_everpsquotation_quotes';
         $this->module_name = 'everpsquotation';
-        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         parent::__construct();
 
         $this->_select = '
@@ -162,20 +161,17 @@ class AdminEverPsQuotationController extends ModuleAdminController
 
     public function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
-        if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans(
-                $string,
-                [],
-                'Modules.Everpsquotation.Admineverpsquotationcontroller'
-            );
-        }
-
-        return parent::l($string, $class, $addslashes, $htmlentities);
+        return Context::getContext()->getTranslator()->trans(
+            $string,
+            [],
+            'Modules.Everpsquotation.Admineverpsquotationcontroller'
+        );
     }
 
     public function initToolbar()
     {
-        //Empty because of reasons :-)
+        parent::initToolbar();
+        unset($this->toolbar_btn['new']);
     }
 
     public function setMedia($isNewTheme = false)
@@ -191,6 +187,7 @@ class AdminEverPsQuotationController extends ModuleAdminController
         $this->initToolbar();
         $this->addRowAction('view');
         $this->addRowAction('dropQuote');
+        $this->addRowAction('convertToOrder');
         $lists = parent::renderList();
         $html = $this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsquotation/views/templates/admin/header.tpl');
         $module_instance = Module::getInstanceByName($this->module_name);
@@ -237,6 +234,37 @@ class AdminEverPsQuotationController extends ModuleAdminController
                 $this->errors[] = Tools::displayError('An error has occurred: Can\'t update the current object');
             }
         }
+        if (Tools::getIsset('convert_to_order')) {
+            $quote = new EverpsquotationClass(
+                (int) Tools::getValue('id_everpsquotation_quotes')
+            );
+            $products = EverpsquotationDetail::getQuoteDetailByQuoteId(
+                (int)$quote->id,
+                (int)$this->context->shop->id,
+                (int)$this->context->language->id
+            );
+            $cart = new Cart();
+            $cart->id_customer = (int) $quote->id_customer;
+            $cart->id_currency = (int) $quote->id_currency;
+            $cart->id_address_delivery = (int) $quote->id_address_delivery;
+            $cart->id_address_invoice = (int) $quote->id_address_invoice;
+            $cart->id_lang = (int) $quote->id_lang;
+            $cart->id_carrier = (int) $quote->id_carrier;
+            $cart->save();
+            foreach ($products as $value) {
+                $cart->updateQty(
+                    $value['product_quantity'],
+                    $value['product_id'],
+                    $value['product_attribute_id'],
+                    false
+                );
+            }
+            $link = new Link();
+            $createOrderLink = $link->getAdminLink('AdminOrders', true, [], ['id_cart' => $cart->id, 'addorder' => 1]);
+            Tools::redirect(
+                'http://localhost/ps8/admin7634ugpd7fexth1thbe/index.php/sell/orders/new?cartId=' . (int) $cart->id . '&_token=on87aET4vTNr7B37xQqNFiydBGBOIb-dO67MxgVoKRw'
+            );
+        }
         return parent::postProcess();
     }
 
@@ -258,6 +286,27 @@ class AdminEverPsQuotationController extends ModuleAdminController
 
         return $this->context->smarty->fetch(
             _PS_MODULE_DIR_.'everpsquotation/views/templates/admin/helpers/lists/list_action_drop_quote.tpl'
+        );
+    }
+
+    public function displayConvertToOrderLink($token, $id_everpsquotation)
+    {
+        if (!$token) {
+            return;
+        }
+        $quote_controller_link  = 'index.php?controller=AdminEverPsQuotation&token=';
+        $quote_controller_link .= Tools::getAdminTokenLite('AdminEverPsQuotation');
+        $quote_controller_link .= '&id_everpsquotation_quotes='.(int)$id_everpsquotation;
+        $quote_controller_link .= '&convert_to_order';
+
+        $this->context->smarty->assign(array(
+            'href' => $quote_controller_link,
+            'confirm' => null,
+            'action' => $this->l('Convert to order')
+        ));
+
+        return $this->context->smarty->fetch(
+            _PS_MODULE_DIR_.'everpsquotation/views/templates/admin/helpers/lists/list_action_convert_quote_to_order.tpl'
         );
     }
 }
