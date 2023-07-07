@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2021 Team Ever
+ * 2019-2023 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2021 Team Ever
+ *  @copyright 2019-2023 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -26,14 +26,15 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
 
     public function __construct($id_everpsquotation_quotes, $smarty)
     {
+        $module = Module::getInstanceByName('everpsquotation');
         $this->id_everpsquotation_quotes = $id_everpsquotation_quotes;
         $this->smarty = $smarty;
         $this->pdfDir = _PS_MODULE_DIR_ . 'everpsquotation/views/templates/front/pdf/';
         $this->context = Context::getContext();
         $this->shop = new Shop(Context::getContext()->shop->id);
         $this->lang = new Language((int)Context::getContext()->language->id);
-        $text = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_TEXT');
-        $filename = Configuration::getConfigInMultipleLangs('EVERPSQUOTATION_FILENAME');
+        $text = $module::getConfigInMultipleLangs('EVERPSQUOTATION_TEXT');
+        $filename = $module::getConfigInMultipleLangs('EVERPSQUOTATION_FILENAME');
         $this->text = $text[(int)Context::getContext()->language->id];
         $this->filename = $filename[(int)Context::getContext()->language->id]
         .$this->id_everpsquotation_quotes;
