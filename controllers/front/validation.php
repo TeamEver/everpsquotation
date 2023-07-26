@@ -104,8 +104,8 @@ class EverpsquotationValidationModuleFrontController extends ModuleFrontControll
         $quote->total_wrapping_tax_incl = (float)$cartdetails['total_wrapping'];
         $quote->total_wrapping_tax_excl = (float)$cartdetails['total_wrapping_tax_exc'];
         $quote->valid = 0;
-        $quote->date_add = $cart->date_add;
-        $quote->date_upd = $cart->date_upd;
+        $quote->date_add = date('Y-m-d H:i:s');
+        $quote->date_upd = date('Y-m-d H:i:s');
         $quote->save();
 
         //Now create new Everpsquotationdetail object

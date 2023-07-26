@@ -41,7 +41,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '4.1.2';
+        $this->version = '4.1.3';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -82,6 +82,7 @@ class Everpsquotation extends PaymentModule
     public function checkHooks()
     {
         return ($this->registerHook('header')
+            && $this->registerHook('displayAfterProductActions')
             && $this->registerHook('displayCustomerAccount')
             && $this->registerHook('displayShoppingCart')
             && $this->registerHook('displayReassurance')
@@ -301,6 +302,14 @@ class Everpsquotation extends PaymentModule
             'use_checkbox' => true,
             'id' => 'id_category_tree',
         );
+        if (file_exists(_PS_MODULE_DIR_.'everpsquotation/views/img/quotation.jpg')) {
+            $defaultUrlImage = $this->_path.'/views/img/quotation.jpg';
+        } else {
+            $defaultUrlImage = Tools::getHttpHost(true).__PS_BASE_URI__.'img/'.Configuration::get(
+                'PS_LOGO'
+            );
+        }
+        $defaultImage = '<img src="'.(string)$defaultUrlImage.'" style="max-width:150px;"/>';
 
         return array(
             'form' => array(
@@ -330,15 +339,6 @@ class Everpsquotation extends PaymentModule
                         ),
                     ),
                     array(
-                        'type' => 'categories',
-                        'name' => 'EVERPSQUOTATION_CATEGORIES',
-                        'label' => $this->l('Category'),
-                        'desc' => $this->l('Allow only these categories on quotations'),
-                        'hint' => $this->l('Only products in selected categories will be allowed for quotes'),
-                        'required' => true,
-                        'tree' => $tree,
-                    ),
-                    array(
                         'type' => 'select',
                         'label' => $this->l('Allowed customer groups'),
                         'desc' => $this->l('Choose allowed groups, customers must be logged'),
@@ -355,6 +355,15 @@ class Everpsquotation extends PaymentModule
                             'id' => 'id_group',
                             'name' => 'name',
                         ),
+                    ),
+                    array(
+                        'col' => 3,
+                        'type' => 'text',
+                        'lang' => false,
+                        'label' => $this->l('Quotation duration'),
+                        'desc' => $this->l('Duration in days of validity of the estimate'),
+                        'hint' => $this->l('Will display a quote expiration date (leave empty for no use)'),
+                        'name' => 'EVERPSQUOTATION_DURATION',
                     ),
                     array(
                         'col' => 3,
@@ -383,6 +392,17 @@ class Everpsquotation extends PaymentModule
                                 'label' => $this->l('No')
                             )
                         ),
+                    ),
+                    array(
+                        'type' => 'file',
+                        'label' => $this->l('Quotation logo'),
+                        'desc' => $this->l('Quotation logo on PDF files'),
+                        'hint' => $this->l('Default will be shop logo'),
+                        'name' => 'image',
+                        'display_image' => true,
+                        'image' => $defaultImage,
+                        'desc' => sprintf($this->l('
+                            maximum image size: %s.'), ini_get('upload_max_filesize')),
                     ),
                     array(
                         'col' => 3,
@@ -434,6 +454,15 @@ class Everpsquotation extends PaymentModule
                         'type' => 'textarea',
                         'autoload_rte' => true,
                         'lang' => true,
+                        'label' => $this->l('Quotation specific mentions'),
+                        'desc' => $this->l('These mentions will be displayed at the bottom of the estimate, after the list of products and the totals'),
+                        'hint' => $this->l('You can specify for example your bank details as well as the mention of good for agreement'),
+                        'name' => 'EVERPSQUOTATION_MENTIONS',
+                    ),
+                    array(
+                        'type' => 'textarea',
+                        'autoload_rte' => true,
+                        'lang' => true,
                         'label' => $this->l('Quotation text on footer'),
                         'desc' => $this->l('Please specify quotation text on footer'),
                         'hint' => $this->l('Add more informations, like SIRET, APE...'),
@@ -458,6 +487,15 @@ class Everpsquotation extends PaymentModule
                                 'label' => $this->l('No')
                             )
                         ),
+                    ),
+                    array(
+                        'type' => 'categories',
+                        'name' => 'EVERPSQUOTATION_CATEGORIES',
+                        'label' => $this->l('Category'),
+                        'desc' => $this->l('Allow only these categories on quotations'),
+                        'hint' => $this->l('Only products in selected categories will be allowed for quotes'),
+                        'required' => true,
+                        'tree' => $tree,
                     ),
                 ),
                 'submit' => array(
@@ -517,6 +555,11 @@ class Everpsquotation extends PaymentModule
             ) {
                 $this->postErrors[] = $this->l('Error: render PDF on validation is not valid');
             }
+            if (Tools::getValue('EVERPSQUOTATION_DURATION')
+                && !Validate::isInt(Tools::getValue('EVERPSQUOTATION_DURATION'))
+            ) {
+                $this->postErrors[] = $this->l('Error: quotation duration is not valid');
+            }
 
             // Multilingual validation
             foreach (Language::getLanguages(false) as $lang) {
@@ -525,6 +568,13 @@ class Everpsquotation extends PaymentModule
                 ) {
                     $this->postErrors[] = $this->l(
                         'Error: text on footer is not valid for lang '
+                    ).$lang['iso_code'];
+                }
+                if (!Tools::getIsset('EVERPSQUOTATION_MENTIONS_'.$lang['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('EVERPSQUOTATION_MENTIONS_'.$lang['id_lang']))
+                ) {
+                    $this->postErrors[] = $this->l(
+                        'Error: Mentions is not valid for lang '
                     ).$lang['iso_code'];
                 }
                 if (!Tools::getIsset('EVERPSQUOTATION_MAIL_SUBJECT_'.$lang['id_lang'])
@@ -575,10 +625,22 @@ class Everpsquotation extends PaymentModule
                 'EVERPSQUOTATION_TEXT_'
                 .$lang['id_lang']
             ) : '';
+            $everpsquotation_mentions[$lang['id_lang']] = (
+                Tools::getValue('EVERPSQUOTATION_MENTIONS_'
+                    .$lang['id_lang'])
+            ) ? Tools::getValue(
+                'EVERPSQUOTATION_MENTIONS_'
+                .$lang['id_lang']
+            ) : '';
         }
+        
         Configuration::updateValue(
             'EVERPSQUOTATION_DROP_SQL',
             Tools::getValue('EVERPSQUOTATION_DROP_SQL')
+        );
+        Configuration::updateValue(
+            'EVERPSQUOTATION_DURATION',
+            Tools::getValue('EVERPSQUOTATION_DURATION')
         );
         Configuration::updateValue(
             'EVERPSQUOTATION_LOGO_WIDTH',
@@ -635,10 +697,56 @@ class Everpsquotation extends PaymentModule
             true
         );
         Configuration::updateValue(
+            'EVERPSQUOTATION_MENTIONS',
+            $everpsquotation_mentions,
+            true
+        );
+
+        Configuration::updateValue(
             'EVERPSQUOTATION_RENDER_ON_VALIDATION',
             Tools::getValue('EVERPSQUOTATION_RENDER_ON_VALIDATION')
         );
 
+        /* Uploads image */
+        $type = Tools::strtolower(Tools::substr(strrchr($_FILES['image']['name'], '.'), 1));
+        $imagesize = @getimagesize($_FILES['image']['tmp_name']);
+        if (isset($_FILES['image']) &&
+            isset($_FILES['image']['tmp_name']) &&
+            !empty($_FILES['image']['tmp_name']) &&
+            !empty($imagesize) &&
+            in_array(
+                Tools::strtolower(Tools::substr(strrchr($imagesize['mime'], '/'), 1)),
+                array(
+                    'jpg',
+                    'gif',
+                    'jpeg',
+                    'png'
+                )
+            ) &&
+            in_array($type, array('jpg', 'gif', 'jpeg', 'png'))
+        ) {
+            $temp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS');
+
+            if ($error = ImageManager::validateUpload($_FILES['image'])) {
+                $this->postErrors[] = $error;
+            } elseif (!$temp_name
+                || !move_uploaded_file($_FILES['image']['tmp_name'], $temp_name)
+            ) {
+                $this->postErrors[] = $this->l('An error occurred during the image upload process.');
+            } elseif (!ImageManager::resize(
+                $temp_name,
+                dirname(__FILE__).'/views/img/quotation.jpg',
+                null,
+                null,
+                $type
+            )) {
+                $this->postErrors[] = $this->l('An error occurred during the image upload process.');
+            }
+
+            if (isset($temp_name)) {
+                @unlink($temp_name);
+            }
+        }
         $this->postSuccess[] = $this->l('All settings have been saved :-)');
     }
 
@@ -718,6 +826,9 @@ class Everpsquotation extends PaymentModule
             'EVERPSQUOTATION_TEXT' => self::getConfigInMultipleLangs(
                 'EVERPSQUOTATION_TEXT'
             ),
+            'EVERPSQUOTATION_MENTIONS' => self::getConfigInMultipleLangs(
+                'EVERPSQUOTATION_MENTIONS'
+            ),            
         );
     }
 
@@ -897,6 +1008,11 @@ class Everpsquotation extends PaymentModule
         return $this->hookDisplayReassurance();
     }
 
+    public function hookDisplayAfterProductActions()
+    {
+        return $this->hookDisplayReassurance();
+    }
+
     public function hookDisplayProductCenterColumn()
     {
         return $this->hookDisplayReassurance();
@@ -1045,9 +1161,7 @@ class Everpsquotation extends PaymentModule
         $cart_details = $ever_cart->getSummaryDetails(
             (int)$cart->id
         );
-        $cart_products = $ever_cart->getProducts(
-            (int)$cart->id
-        );
+        $cart_products = $ever_cart->getProducts();
 
         // Now create quotation
         $quote = new EverpsquotationClass();
@@ -1077,8 +1191,8 @@ class Everpsquotation extends PaymentModule
         $quote->total_wrapping_tax_incl = (float)$cart_details['total_wrapping'];
         $quote->total_wrapping_tax_excl = (float)$cart_details['total_wrapping_tax_exc'];
         $quote->valid = 0;
-        $quote->date_add = $cart->date_add;
-        $quote->date_upd = $cart->date_upd;
+        $quote->date_add = date('Y-m-d H:i:s');
+        $quote->date_upd = date('Y-m-d H:i:s');
         $quote->save();
 
         // Add ever cart to quotation details

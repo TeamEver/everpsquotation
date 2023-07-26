@@ -236,6 +236,9 @@ class EverpsquotationCart extends ObjectModel
             'everpsquotation_cart_product'
         );
         $sql->where(
+            'id_everpsquotation_cart = '.(int)$this->id
+        );
+        $sql->where(
             'id_product = '.(int)$id_product
         );
         $sql->where(

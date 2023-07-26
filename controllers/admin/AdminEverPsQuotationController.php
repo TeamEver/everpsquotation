@@ -155,7 +155,7 @@ class AdminEverPsQuotationController extends ModuleAdminController
         $moduleConfUrl .= Tools::getAdminTokenLite('AdminModules');
         $this->context->smarty->assign(array(
             'moduleConfUrl' => $moduleConfUrl,
-            'everpsquotation_dir' => Tools::getHttpHost(true).'/modules/everpsquotation'
+            'everpsquotation_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsquotation'
         ));
     }
 

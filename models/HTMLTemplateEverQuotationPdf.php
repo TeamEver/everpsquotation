@@ -27,15 +27,18 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
     public function __construct($id_everpsquotation_quotes, $smarty)
     {
         $module = Module::getInstanceByName('everpsquotation');
+        $text = $module::getConfigInMultipleLangs('EVERPSQUOTATION_TEXT');
+        $mentions = $module::getConfigInMultipleLangs('EVERPSQUOTATION_MENTIONS');
+        $filename = $module::getConfigInMultipleLangs('EVERPSQUOTATION_FILENAME');
         $this->id_everpsquotation_quotes = $id_everpsquotation_quotes;
         $this->smarty = $smarty;
         $this->pdfDir = _PS_MODULE_DIR_ . 'everpsquotation/views/templates/front/pdf/';
         $this->context = Context::getContext();
         $this->shop = new Shop(Context::getContext()->shop->id);
         $this->lang = new Language((int)Context::getContext()->language->id);
-        $text = $module::getConfigInMultipleLangs('EVERPSQUOTATION_TEXT');
-        $filename = $module::getConfigInMultipleLangs('EVERPSQUOTATION_FILENAME');
         $this->text = $text[(int)Context::getContext()->language->id];
+        $this->mentions = $mentions[(int)Context::getContext()->language->id];
+        $this->duration = Configuration::get('EVERPSQUOTATION_DURATION');
         $this->filename = $filename[(int)Context::getContext()->language->id]
         .$this->id_everpsquotation_quotes;
     }
@@ -91,6 +94,7 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
             'total_wrapping_tax_excl' => $everpsquotation->total_wrapping_tax_excl,
             'total_taxes' => $total_taxes,
             'date_add' => $everpsquotation->date_add,
+            'everpsquotationmentions' => $this->mentions,
         ));
 
         return $this->smarty->fetch($this->pdfDir . '/everquotation_content.tpl');
@@ -104,19 +108,28 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
         $customerAddressDelivery = new Address($everpsquotation->id_address_delivery);
         $id_shop = (int)Context::getContext()->shop->id;
         $shop_address = $this->getShopAddress();
-        $logo = Configuration::get(
-            'PS_LOGO_INVOICE'
-        );
-        if (!$logo) {
-            $logo = Configuration::get(
+        if ((int) $this->duration > 0) {
+            // Ajouter la durée en jours à la date d'ajout
+            $newDateTimestamp = strtotime($everpsquotation->date_add . " +{$this->duration} days");
+
+            // Formater la nouvelle date au format 'd/m/Y'
+            $deadline = date('d/m/Y', $newDateTimestamp);
+        } else {
+            $deadline = false;
+        }
+
+        if (file_exists(_PS_MODULE_DIR_.'everpsquotation/views/img/quotation.jpg')) {
+            $pathLogo = _PS_MODULE_DIR_.'everpsquotation/views/img/quotation.jpg';
+        } else {
+            $pathLogo = __PS_BASE_URI__.'img/'.Configuration::get(
                 'PS_LOGO'
             );
         }
-        $path_logo = _PS_IMG_ . $logo;
         $width = (int)Configuration::get('EVERPSQUOTATION_LOGO_WIDTH');
       
 
         $this->smarty->assign(array(
+            'deadline' => $deadline,
             'id_everpsquotation_quotes' => $this->id_everpsquotation_quotes,
             'prefix' => Configuration::get('EVERPSQUOTATION_PREFIX'),
             'date_add' => $everpsquotation->date_add,
@@ -125,7 +138,7 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
             'customerAddress' => $customerAddress,
             'customerAddressDelivery' => $customerAddressDelivery,
             'shop_address' => $shop_address,
-            'logo_path' => $path_logo,
+            'logo_path' => $pathLogo,
             'width_logo' => $width,
             'shop_phone' => Configuration::get('PS_SHOP_PHONE', null, null, (int)$id_shop),
             'shop_email' => Configuration::get('PS_SHOP_EMAIL', null, null, (int)$id_shop),

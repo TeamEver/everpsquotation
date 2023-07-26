@@ -177,7 +177,7 @@
             <td align="left" class="details-{$value.id_everpsquotation_quote_detail|escape:'htmlall':'UTF-8'}"
                 id="product_name">
                 {$value.product_name|escape:'htmlall':'UTF-8'}<br>
-                {$value.name|escape:'htmlall':'UTF-8'}<br>
+                {* {$value.description_short|escape:'htmlall':'UTF-8'}<br> *}
                 {if isset($customizations) && $customizations}
                 {l s='Customization :' mod='everpsquotation'}<br>
                 {foreach from=$customizations item=customization}
@@ -261,3 +261,4 @@
 </table>
 <!-- //Table total -->
 {/if}
+{$everpsquotationmentions}

@@ -216,12 +216,22 @@ class EverpsquotationDetail extends ObjectModel
         $sql->from('everpsquotation_quote_detail', 'c');
         $sql->leftJoin('product_attribute', 'pa', 'c.product_attribute_id = pa.id_product_attribute');
         $sql->leftJoin('product_attribute_combination', 'pac', 'c.product_attribute_id = pac.id_product_attribute');
-        $sql->leftJoin('attribute_lang', 'al', 'pac.id_attribute = al.id_attribute AND al.id_lang = '.(int)$id_lang);
-        $sql->where('c.id_everpsquotation_quotes = '.(int)$id_everpsquotation_quotes);
-        $sql->where('c.id_shop = '.(int)$id_shop);
+        $sql->leftJoin('attribute_lang', 'al', 'pac.id_attribute = al.id_attribute AND al.id_lang = ' . (int)$id_lang);
+        $sql->where('c.id_everpsquotation_quotes = ' . (int)$id_everpsquotation_quotes);
+        $sql->where('c.id_shop = ' . (int)$id_shop);
         $sql->groupBy('id_everpsquotation_quote_detail');
         $sql->orderBy('id_everpsquotation_quote_detail');
-        return Db::getInstance()->executeS($sql);
+        $return = Db::getInstance()->executeS($sql);
+        foreach ($return as &$detail) {
+            $product = new Product(
+                (int) $detail['product_id'],
+                false,
+                (int) $id_lang,
+                (int) $id_shop
+            );
+            $detail['description_short'] = strip_tags($product->description_short);
+        }
+        return $return;
     }
 
     public static function getCustomizationValue($id_customization)
