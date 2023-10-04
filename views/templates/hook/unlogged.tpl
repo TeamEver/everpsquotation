@@ -15,8 +15,11 @@
  *  @copyright 2019-2023 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<a href="{$link->getPageLink('my-account', true)|escape:'htmlall':'UTF-8'}">
+{assign var="addressLink" value=$link->getPageLink('my-account', true)}
+
+{$obfAddressLink = $addressLink|base64_encode}
+<span data-obflink="{$obfAddressLink|escape:'htmlall':'UTF-8'}">
 <div class="text-sm-center alert alert-warning quote_unlogged">
     <p>{l s='You must be logged to' mod='everpsquotation'}{l s='request for a quote.' mod='everpsquotation'}</span> {l s='Click here to connect to your account' mod='everpsquotation'}</p>
 </div>
-</a>
+</span>

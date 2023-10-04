@@ -15,6 +15,7 @@
  *  @copyright 2019-2023 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
+{$everpsquotationmentions}
 <table style="width: 100%;">
     <tr>
         <td style="text-align: center; font-size: 6pt; color: #444;  width:100%;line-height:5px;">

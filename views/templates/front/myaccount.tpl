@@ -15,9 +15,13 @@
  *  @copyright 2019-2023 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<a class="col-lg-4 col-md-6 col-sm-6 col-xs-12" href="{$link->getModuleLink('everpsquotation','quotations')|escape:'htmlall':'UTF-8'}">
-    <span class="link-item">
-        <i class="fto-doc-text-inv mar_r4 fs_lg material-icons hvr-wobble-to-bottom-right">alarm</i>
-        {l s='My quotations' mod='everpsquotation'}
-    </span>
- </a>
+<div class="col-lg-3 col-md-6 col-sm-6 col-12 container-card-account">
+    <div class="bg-img-card-account-">
+        <a id="everpsquotation-link" href="{$link->getModuleLink('everpsquotation','quotations')|escape:'htmlall':'UTF-8'}">
+            <span class="link-item">
+                <i class="fto-doc-text-inv mar_r4 fs_lg material-icons hvr-wobble-to-bottom-right">alarm</i>
+                {l s='My quotations' mod='everpsquotation'}
+            </span>
+         </a>
+    </div>
+</div>

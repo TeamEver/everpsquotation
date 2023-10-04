@@ -15,8 +15,11 @@
  *  @copyright 2019-2023 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<a href="{$link->getPageLink('my-account', true)|escape:'htmlall':'UTF-8'}">
+{assign var="addressLink" value=$link->getPageLink('my-account', true)}
+
+{$obfAddressLink = $addressLink|base64_encode}
+<span data-obflink="{$obfAddressLink}">
 <div class="text-sm-center alert alert-warning quote_noaddress">
     <p>{l s='You must create an address to' mod='everpsquotation'} <span class="bold">{l s='request for a quote.' mod='everpsquotation'}</span> {l s='Click here to add a new address' mod='everpsquotation'}</p>
 </div>
-</a>
+</span>

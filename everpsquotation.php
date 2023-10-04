@@ -41,7 +41,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '4.1.3';
+        $this->version = '4.2.1';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -205,6 +205,7 @@ class Everpsquotation extends PaymentModule
      */
     public function getContent()
     {
+        $this->registerHook('displayAdminEndContent');
         if (Tools::isSubmit('submitEverpsquotationModule')) {
             $this->postValidation();
 
@@ -832,6 +833,25 @@ class Everpsquotation extends PaymentModule
         );
     }
 
+    public function hookDisplayAdminEndContent($params)
+    {
+        $controller_name = Tools::getValue('controller');
+        if ($controller_name == 'AdminCarts')
+        {
+            $token = Tools::getAdminToken('AdminEverPsQuotation'.(int)Tab::getIdFromClassName('AdminEverPsQuotation').(int)Context::getContext()->employee->id);
+            $id_cart = Tools::getValue('id_cart');
+            $cart = new Cart(
+                (int) $id_cart
+            );
+            $cartproducts = $cart->getProducts();
+            if (count($cartproducts) <= 0) {
+                return;
+            }
+            $href = 'index.php?controller=AdminEverPsQuotation&transformThisCartId='.$id_cart.'&token='.$token;
+            return '<a class="btn btn-default" href="'.$href.'"><i class="icon-shopping-cart"></i> '.$this->l('Create a quotation from this cart').'</a>';
+        }
+    }
+
     /**
      * Hook payment, PS 1.7 only.
      */
@@ -965,8 +985,10 @@ class Everpsquotation extends PaymentModule
             array(),
             true
         );
+        $encodedValidationUrl = base64_encode($validationUrl);
         $this->context->smarty->assign(array(
-            'validationUrl' => $validationUrl,
+            'validationUrl' => $encodedValidationUrl,
+            'quotationCartId' => $this->context->cart->id,
         ));
         if (!$this->context->customer->isLogged()) {
             return $this->display(__FILE__, 'views/templates/hook/unlogged.tpl');
