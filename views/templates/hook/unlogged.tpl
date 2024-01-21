@@ -15,7 +15,9 @@
  *  @copyright 2019-2023 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-<!-- Bouton pour déclencher la modale -->
-<button type="button" class="btn btn-primary" id="everquotationModal">
-  {l s='Ask for a quote' mod='everpsquotation'}
-</button>
+<!-- Bouton pour déclencher la modal -->
+<div class="text-sm-center my-2">
+  <button type="button" class="btn btn-primary" id="everquotationModal">
+    {l s='Ask for a quote' mod='everpsquotation'}
+  </button>
+</div>

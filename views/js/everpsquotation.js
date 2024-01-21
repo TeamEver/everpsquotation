@@ -1,13 +1,9 @@
 $(document).ready(function() {
     $('#everpsquotationform').on('submit', function(event) {
         event.preventDefault();
-
-        // Serialiser les données du formulaire
         var formData = $(this).serialize();
-
-        // Requête AJAX initiale
         $.ajax({
-            url: everpsquotation_quote_link, // Remplacez par l'URL correcte
+            url: everpsquotation_quote_link,
             type: 'POST',
             data: formData,
             dataType: 'json',
@@ -60,9 +56,8 @@ $(document).ready(function() {
     });
     $('#everpscartquotation').click(function(e){
         event.preventDefault();
-        // Requête AJAX initiale
         $.ajax({
-            url: everpsquotation_quote_link, // Remplacez par l'URL correcte
+            url: everpsquotation_quote_link,
             type: 'POST',
             dataType: 'json',
             success: function(response) {

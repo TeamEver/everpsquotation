@@ -87,6 +87,7 @@ class Everpsquotation extends PaymentModule
             && $this->registerHook('displayShoppingCart')
             && $this->registerHook('displayReassurance')
             && $this->registerHook('paymentOptions')
+            && $this->registerHook('displayAdminEndContent')
             && $this->registerHook('displayCartModalFooter'));
     }
 
@@ -963,6 +964,25 @@ class Everpsquotation extends PaymentModule
                 $pdf = new PDF(Tools::getValue('quoteId'), 'EverQuotationPdf', Context::getContext()->smarty);
                 $returnedPdf = $pdf->render();
             }
+        }
+    }
+
+    public function hookDisplayAdminEndContent($params)
+    {
+        $controller_name = Tools::getValue('controller');
+        if ($controller_name == 'AdminCarts')
+        {
+            $token = Tools::getAdminToken('AdminEverPsQuotation'.(int)Tab::getIdFromClassName('AdminEverPsQuotation').(int)Context::getContext()->employee->id);
+            $id_cart = Tools::getValue('id_cart');
+            $cart = new Cart(
+                (int) $id_cart
+            );
+            $cartproducts = $cart->getProducts();
+            if (count($cartproducts) <= 0) {
+                return;
+            }
+            $href = 'index.php?controller=AdminEverPsQuotation&transformThisCartId=' . $id_cart . '&token=' . $token;
+            return '<a class="btn btn-default" href="' . $href . '"><i class="icon-shopping-cart"></i> ' . $this->l('Create a quotation from this cart') . '</a>';
         }
     }
 

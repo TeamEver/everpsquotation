@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2023 Team Ever
+ * 2019-2024 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -367,7 +367,6 @@ class AdminEverPsQuotationController extends ModuleAdminController
         foreach ($cartproducts as $cartproduct) {
             $quotedetail = new EverpsquotationDetail();
             $quotedetail->id_everpsquotation_quotes = (int)$quote->id;
-            $quotedetail->id_warehouse = $cartdetails['total_discounts']['id_warehouse'];
             $quotedetail->id_shop = (int)$cartproduct['id_shop'];
             $quotedetail->product_id = (int)$cartproduct['id_product'];
             $quotedetail->product_attribute_id = (int)$cartproduct['id_product_attribute'];

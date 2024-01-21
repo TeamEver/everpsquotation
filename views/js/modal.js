@@ -12,6 +12,7 @@ $(document).ready(function() {
                     $('#customerInfoModal').modal('show');
                     $('#customerInfoModal').on('hidden.bs.modal', function () {
                         $(this).modal('hide').remove();
+                        $('.modal-backdrop').remove();
                     });
                 }
             },
@@ -36,7 +37,8 @@ $(document).ready(function() {
                     $('body').append(response.confirmModal);
                     $('#quotationConfirmModal').modal('show');
                     $('#quotationConfirmModal').on('hidden.bs.modal', function () {
-                        $(this).modal('hide').remove();
+                        $('#quotationConfirmModal').modal('hide').remove();
+                        $('.modal-backdrop').remove();
                     });
                 }
             },
