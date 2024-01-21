@@ -33,6 +33,8 @@
     {else}
         <input type="hidden" name="ever_qty" id="ever_quantity_wanted" value="1">
     {/if}
+    <input type="hidden" name="everid_product" id="everid_product" value="{$everid_product|escape:'htmlall':'UTF-8'}">
+    <input type="hidden" name="simple_quotation" id="simple_quotation" value="1">
     <input type="hidden" name="everid_product_attribute" id="everidCombination" value="" />
     <button class="btn btn-primary add-to-quote" id="everpsproductquotation" name="everpsproductquotation" type="submit">
         {l s='Download a quote' mod='everpsquotation'}

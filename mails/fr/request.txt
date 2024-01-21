@@ -1,0 +1,12 @@
+
+ 
+
+Une demande de devis a été réalisée par {firstname} {lastname}
+
+Prénom : {firstname}
+Nom : {lastname}
+Email : {email}
+Téléphone : {phone}
+Désire être contacté : {contacted}
+
+{shop_name} 

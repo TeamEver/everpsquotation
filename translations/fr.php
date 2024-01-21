@@ -139,8 +139,9 @@ $_MODULE['<{everpsquotation}prestashop>everquotation_content_91e05c58d3dd541399e
 $_MODULE['<{everpsquotation}prestashop>everquotation_content_b76c1a1463e45cece931ef4467c0bdf8'] = 'Total réductions';
 $_MODULE['<{everpsquotation}prestashop>everquotation_content_7bf753e0cbb2d38818ba2a3ee3b36f4d'] = 'Total taxes';
 $_MODULE['<{everpsquotation}prestashop>everquotation_content_f617c53a5521d2c3be8cd30653e76ee3'] = 'Total TTC';
-$_MODULE['<{everpsquotation}prestashop>everquotation_header_b2844b8e17ecaaeae68d018fe9418af0'] = 'Valide jusqu\'au';
 $_MODULE['<{everpsquotation}prestashop>everquotation_header_73015b3208cdee70a4497235463b63d7'] = 'Devis';
+$_MODULE['<{everpsquotation}prestashop>everquotation_header_a16bf6c722e10df818ce2562262f1e23'] = 'Date :';
+$_MODULE['<{everpsquotation}prestashop>everquotation_header_b2844b8e17ecaaeae68d018fe9418af0'] = 'Valide jusqu\'au';
 $_MODULE['<{everpsquotation}prestashop>cartbutton_4475d7d14d37b59319eda28f74829e38'] = 'Télécharger un devis';
 $_MODULE['<{everpsquotation}prestashop>noaddress_fa159bb9c57b7a175224af1d7f4445d3'] = 'Vous devez créer une adresse pour ';
 $_MODULE['<{everpsquotation}prestashop>noaddress_593458947b02dfdf0ee15829fc0a7a69'] = 'demander un devis.';

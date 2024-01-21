@@ -16,7 +16,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <div class="text-sm-center my-2">
-    <span data-obflink="{$validationUrl|escape:'htmlall':'UTF-8'}" class="btn btn-primary add-to-quote" id="everpscartquotation">
-        {l s='Download a quote' mod='everpsquotation'} <span style="display:none;">{$quotationCartId}</span>
-    </span>
+    <a href="{$validationUrl|escape:'htmlall':'UTF-8'}" class="btn btn-primary add-to-quote" id="everpscartquotation">
+        {l s='Download a quote' mod='everpsquotation'}
+    </a>
 </div>

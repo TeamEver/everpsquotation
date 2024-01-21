@@ -12,20 +12,17 @@
             {if $logo_path}
                 <img src="{$logo_path|escape:'htmlall':'UTF-8'}" style="width:{$width_logo|escape:'htmlall':'UTF-8'}px;" />
             {/if}
-            <div>{$shop_address|escape:'htmlall':'UTF-8'}</div>
+            {* <div>{$shop_address|escape:'htmlall':'UTF-8'}</div> *}
         </td>
         <td style="width: 50%" align="right" valign="middle">
-            <h4>{$shop_name|escape:'htmlall':'UTF-8'}</h4>
-            <h4>{$date_add|date_format:"%D"|escape:'htmlall':'UTF-8'}</h4>
+            <h3>{l s='Quotation' mod='everpsquotation'} : {if
+                $prefix}{$prefix|escape:'htmlall':'UTF-8'}{/if}{$id_everpsquotation_quotes|escape:'htmlall':'UTF-8'}
+            </h3>
+            {* <h4>{$shop_name|escape:'htmlall':'UTF-8'}</h4> *}
+            <h4>{l s='Date :' mod='everpsquotation'} {$date_add|date_format:"%D"|escape:'htmlall':'UTF-8'}</h4>
             {if isset($deadline) && $deadline}
             <h4>{l s='Valid until' mod='everpsquotation'} {$deadline|date_format:"%D"|escape:'htmlall':'UTF-8'}</h4>
             {/if}
-            <h3>{l s='Quotation' mod='everpsquotation'} {if
-                $prefix}{$prefix|escape:'htmlall':'UTF-8'}{/if}{$id_everpsquotation_quotes|escape:'htmlall':'UTF-8'}
-            </h3>
-
-
-
         </td>
     </tr>
 </table>

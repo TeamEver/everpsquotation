@@ -35,7 +35,13 @@
                     <td>{$customerInfos->email|escape:'htmlall':'UTF-8'}</td>
                 </tr>
                 <tr>
-                    <td>{$customerAddress->phone|escape:'htmlall':'UTF-8'}</td>
+                    <td>
+                    {if isset($customerAddress->phone) && $customerAddress->phone}
+                    {$customerAddress->phone|escape:'htmlall':'UTF-8'}
+                    {else}
+                    {$customerAddress->phone_mobile|escape:'htmlall':'UTF-8'}
+                    {/if}
+                    </td>
                 </tr>
                 <tr>
                     <td>{$customerAddress->address1|escape:'htmlall':'UTF-8'}</td>
