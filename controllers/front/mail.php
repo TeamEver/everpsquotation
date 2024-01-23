@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2023 Team Ever
+ * 2019-2024 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -53,6 +53,12 @@ class EverpsquotationMailModuleFrontController extends ModuleFrontController
         if (!Tools::getValue('token') || $token != Tools::getValue('token')) {
             Tools::redirect('index.php');
         }
+        if (!Tools::getValue('dataPolicyConsent')) {
+            die(json_encode([
+                'error' => true,
+                'message' => $this->l('You have to consent our data policy terms'),
+            ]));
+        }
         $firstName = Tools::getValue('everfirstName');
         $lastName = Tools::getValue('everlastName');
         $email = Tools::getValue('everemail');
@@ -69,8 +75,6 @@ class EverpsquotationMailModuleFrontController extends ModuleFrontController
     {
         $mailTemplate = 'request';
         $mailSubject = $this->l('New quote request');
-
-
         if (Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL')) {
             $to = Configuration::get('EVERPSQUOTATION_ACCOUNT_EMAIL');
         } else {

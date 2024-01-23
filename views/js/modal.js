@@ -34,6 +34,11 @@ $(document).ready(function() {
             success: function(response) {
                 $('#customerInfoModal').modal('hide').remove();
                 if (response.confirmModal) {
+                    window.dataLayer = window.dataLayer || [];
+                    window.dataLayer.push({
+                        'event': 'requestForQuote',
+                        'quoteEventId': quotation_event_id,
+                    });
                     $('body').append(response.confirmModal);
                     $('#quotationConfirmModal').modal('show');
                     $('#quotationConfirmModal').on('hidden.bs.modal', function () {

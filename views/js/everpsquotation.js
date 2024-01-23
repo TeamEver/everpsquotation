@@ -11,16 +11,16 @@ $(document).ready(function() {
                 // Insérer le tag GTM dans le DOM
                 if (response.gtm) {
                     // Vérification et traitement des données pour GTM
-                    if (response.quoteEvent && response.quoteId && response.quoteCustomer && response.quoteCurrency && response.quoteShopName && response.quoteProducts) {
-                        var quoteProductsArray = response.quoteProducts.map(function(product) {
+                    if (response.gtm.quoteEvent && response.gtm.quoteId && response.gtm.quoteCustomer && response.gtm.quoteCurrency && response.gtm.quoteShopName && response.gtm.quoteProducts) {
+                        var quoteProductsArray = response.gtm.quoteProducts.map(function(product) {
                             return {
                                 'productId': product.product_id,
                                 'productAttributeId': product.product_attribute_id,
                                 'productCustomizationId': product.id_customization,
-                                'productName': product.name,
+                                'productName': product.product_name,
                                 'productReference': product.product_reference,
                                 'productEan13': product.product_ean13,
-                                'productQuantity': product.quantity,
+                                'productQuantity': product.product_quantity,
                                 'productWeight': product.product_weight,
                                 'productSupplierReference': product.product_supplier_reference,
                                 'productPrice': product.product_price,
@@ -36,11 +36,12 @@ $(document).ready(function() {
 
                         window.dataLayer = window.dataLayer || [];
                         window.dataLayer.push({
-                            'event': response.quoteEvent,
-                            'quoteId': response.quoteId,
-                            'customer_email': response.quoteCustomer.email,
-                            'currency': response.quoteCurrency.name,
-                            'quoteShopName': response.quoteShopName,
+                            'event': response.gtm.quoteEvent,
+                            'quoteEventId': quotation_event_id,
+                            'quoteId': response.gtm.quoteId,
+                            // 'customer_email': response.gtm.quoteCustomer.email,
+                            'currency': response.gtm.quoteCurrency.name,
+                            'quoteShopName': response.gtm.quoteShopName,
                             'quoteProducts': quoteProductsArray
                         });
                     }
@@ -104,6 +105,37 @@ $(document).ready(function() {
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.error('Erreur dans la première requête AJAX:', textStatus, errorThrown);
+            }
+        });
+    });
+
+    // Gestionnaire d'événement pour la soumission du formulaire
+    $(document).on('submit', '#everquotationAskForQuoteCart', function(e) {
+        e.preventDefault();
+        var formData = $(this).serialize(); // Récupère les données du formulaire
+        $.ajax({
+            url: everpsquotation_quoterequest_link, // Remplacez par l'URL correcte
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                $('#customerInfoModal').modal('hide').remove();
+                if (response.confirmModal) {
+                    window.dataLayer = window.dataLayer || [];
+                    window.dataLayer.push({
+                        'event': 'requestForQuote',
+                        'quoteEventId': quotation_event_id,
+                    });
+                    $('body').append(response.confirmModal);
+                    $('#quotationConfirmModal').modal('show');
+                    $('#quotationConfirmModal').on('hidden.bs.modal', function () {
+                        $('#quotationConfirmModal').modal('hide').remove();
+                        $('.modal-backdrop').remove();
+                    });
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Erreur:', textStatus, errorThrown);
             }
         });
     });

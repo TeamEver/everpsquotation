@@ -16,20 +16,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 
-<!-- Modale Bootstrap -->
-<div class="modal fade" id="customerInfoModal" tabindex="-1" role="dialog" aria-labelledby="customerInfoModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <!-- En-tête de la modale -->
-      <div class="modal-header">
-        <h5 class="modal-title" id="customerInfoModalLabel">{l s='Ask for a quote' mod='everpsquotation'}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <!-- Contenu de la modale (Votre formulaire) -->
-      <div class="modal-body">
-          <form id="everquotationAskForQuote">
+          <form id="everquotationAskForQuoteCart">
               <!-- Champ prénom -->
               <div class="form-group">
                   <label for="firstName">{l s='Firstname' mod='everpsquotation'}</label>
@@ -79,7 +66,3 @@
               </div>
               <button type="submit" class="btn btn-primary">{l s='Submit' mod='everpsquotation'}</button>
           </form>
-      </div>
-    </div>
-  </div>
-</div>

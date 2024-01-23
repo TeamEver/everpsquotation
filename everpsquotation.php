@@ -909,9 +909,6 @@ class Everpsquotation extends PaymentModule
     
     public function hookHeader($params)
     {
-        if (Tools::getValue('quoteId')) {
-            die(var_dump(Tools::getValue('quoteId')));
-        }
         $controller_name = Tools::getValue('controller');
         $token = Tools::encrypt(
             $this->name . '_token/setquote'
@@ -924,8 +921,11 @@ class Everpsquotation extends PaymentModule
                 'token' => $token,
             ]
         );
+
         Media::addJsDef([
             $this->name . '_quote_link ' => $quoteAjaxLink,
+            $this->name . '_quoterequest_link ' => $quoteRequestAjaxLink,
+            'quotation_event_id' => Configuration::get('EVERPSQUOTATION_TRANSACTION_ID'),
         ]);
         if (!$this->context->customer->isLogged()) {
             $quoteRequestAjaxLink = $this->context->link->getModuleLink(
@@ -936,9 +936,6 @@ class Everpsquotation extends PaymentModule
                     'token' => $token,
                 ]
             );
-            Media::addJsDef([
-                $this->name . '_quoterequest_link ' => $quoteRequestAjaxLink,
-            ]);
             $this->context->controller->registerJavascript(
                 'module-modal-' . $this->name,
                 'modules/' . $this->name . '/views/js/modal.js',
@@ -959,11 +956,6 @@ class Everpsquotation extends PaymentModule
         if ($controller_name == 'product') {
             $this->context->controller->addJs($this->_path.'views/js/createProductQuote.js');
             $this->context->controller->addCss($this->_path.'views/css/everpsquotation.css');
-            // Render PDF for direct download
-            if (Tools::getValue('quoteId')) {
-                $pdf = new PDF(Tools::getValue('quoteId'), 'EverQuotationPdf', Context::getContext()->smarty);
-                $returnedPdf = $pdf->render();
-            }
         }
     }
 
@@ -988,7 +980,7 @@ class Everpsquotation extends PaymentModule
 
     public function hookDisplayShoppingCartFooter()
     {
-        return $this->hookDisplayShoppingCart();
+        return $this->display(__FILE__, 'views/templates/hook/form.tpl');
     }
 
     public function hookDisplayCartModalFooter()
