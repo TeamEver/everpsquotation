@@ -119,17 +119,17 @@ $(document).ready(function() {
             data: formData,
             dataType: 'json',
             success: function(response) {
-                $('#customerInfoModal').modal('hide').remove();
+                $('#everquotationAskForQuoteCart').remove();
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                    'event': 'requestForQuote',
+                    'quoteEventId': quotation_event_id,
+                });
                 if (response.confirmModal) {
-                    window.dataLayer = window.dataLayer || [];
-                    window.dataLayer.push({
-                        'event': 'requestForQuote',
-                        'quoteEventId': quotation_event_id,
-                    });
                     $('body').append(response.confirmModal);
                     $('#quotationConfirmModal').modal('show');
                     $('#quotationConfirmModal').on('hidden.bs.modal', function () {
-                        $('#quotationConfirmModal').modal('hide').remove();
+                        $(this).modal('hide').remove();
                         $('.modal-backdrop').remove();
                     });
                 }

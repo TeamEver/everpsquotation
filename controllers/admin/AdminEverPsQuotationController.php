@@ -191,7 +191,7 @@ class AdminEverPsQuotationController extends ModuleAdminController
         $lists = parent::renderList();
         $html = $this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsquotation/views/templates/admin/header.tpl');
         $module_instance = Module::getInstanceByName($this->module_name);
-        if ($module_instance->checkLatestEverModuleVersion($this->module_name, $module_instance->version)) {
+        if ($module_instance->checkLatestEverModuleVersion()) {
             $html .= $this->context->smarty->fetch(
                 _PS_MODULE_DIR_
                     . '/'

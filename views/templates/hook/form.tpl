@@ -15,54 +15,56 @@
  *  @copyright 2019-2023 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
+<div class="col-12">
+  <form id="everquotationAskForQuoteCart">
+      <span class="h2">{l s='Request for a quote' mod='everpsquotation'}</span>
+      <!-- Champ prénom -->
+      <div class="form-group">
+          <label for="firstName">{l s='Firstname' mod='everpsquotation'}</label>
+          <input type="text" class="form-control" id="quotefirstName" name="quotefirstName" required>
+      </div>
 
-          <form id="everquotationAskForQuoteCart">
-              <!-- Champ prénom -->
-              <div class="form-group">
-                  <label for="firstName">{l s='Firstname' mod='everpsquotation'}</label>
-                  <input type="text" class="form-control" id="quotefirstName" name="quotefirstName" required>
-              </div>
+      <!-- Champ nom -->
+      <div class="form-group">
+          <label for="lastName">{l s='Lastname' mod='everpsquotation'}</label>
+          <input type="text" class="form-control" id="quotelastName" name="quotelastName" required>
+      </div>
 
-              <!-- Champ nom -->
-              <div class="form-group">
-                  <label for="lastName">{l s='Lastname' mod='everpsquotation'}</label>
-                  <input type="text" class="form-control" id="quotelastName" name="quotelastName" required>
-              </div>
+      <!-- Champ email -->
+      <div class="form-group">
+          <label for="email">{l s='Email' mod='everpsquotation'}</label>
+          <input type="email" class="form-control" id="quoteemail" name="quoteemail" required>
+      </div>
 
-              <!-- Champ email -->
-              <div class="form-group">
-                  <label for="email">{l s='Email' mod='everpsquotation'}</label>
-                  <input type="email" class="form-control" id="quoteemail" name="quoteemail" required>
-              </div>
+      <!-- Champ téléphone -->
+      <div class="form-group">
+          <label for="phone">{l s='Phone' mod='everpsquotation'}</label>
+          <input type="text" class="form-control" id="quotephone" name="quotephone">
+      </div>
 
-              <!-- Champ téléphone -->
-              <div class="form-group">
-                  <label for="phone">{l s='Phone' mod='everpsquotation'}</label>
-                  <input type="text" class="form-control" id="quotephone" name="quotephone">
+      <!-- Boutons radio pour être recontacté -->
+      <div class="form-group">
+          <label>{l s='Be contacted by our advisors' mod='everpsquotation'}</label>
+          <div>
+              <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="contacted" id="contactYes" value="yes" checked>
+                  <label class="form-check-label" for="contactYes">{l s='Yes' mod='everpsquotation'}</label>
               </div>
-
-              <!-- Boutons radio pour être recontacté -->
-              <div class="form-group">
-                  <label>{l s='Be contacted by our advisors' mod='everpsquotation'}</label>
-                  <div>
-                      <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="contacted" id="contactYes" value="yes" checked>
-                          <label class="form-check-label" for="contactYes">{l s='Yes' mod='everpsquotation'}</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="contacted" id="contactNo" value="no">
-                          <label class="form-check-label" for="contactNo">{l s='No' mod='everpsquotation'}</label>
-                      </div>
-                  </div>
+              <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="contacted" id="contactNo" value="no">
+                  <label class="form-check-label" for="contactNo">{l s='No' mod='everpsquotation'}</label>
               </div>
-              <!-- Case de consentement pour la politique des données personnelles -->
-              <div class="form-group">
-                  <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="dataPolicyConsent" name="dataPolicyConsent" required>
-                      <label class="form-check-label" for="dataPolicyConsent">
-                          {l s='I agree to the data policy terms' mod='everpsquotation'}
-                      </label>
-                  </div>
-              </div>
-              <button type="submit" class="btn btn-primary">{l s='Submit' mod='everpsquotation'}</button>
-          </form>
+          </div>
+      </div>
+      <!-- Case de consentement pour la politique des données personnelles -->
+      <div class="form-group container">
+          <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="dataPolicyConsent" name="dataPolicyConsent" required>
+              <label class="form-check-label" for="dataPolicyConsent">
+                  {l s='I agree to the data policy terms' mod='everpsquotation'}
+              </label>
+          </div>
+      </div>
+      <button type="submit" class="btn btn-primary">{l s='Submit' mod='everpsquotation'}</button>
+  </form>
+</div>

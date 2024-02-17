@@ -37,6 +37,7 @@ $(document).ready(function() {
                     window.dataLayer = window.dataLayer || [];
                     window.dataLayer.push({
                         'event': 'requestForQuote',
+                        'rgpdChecked': 1,
                         'quoteEventId': quotation_event_id,
                     });
                     $('body').append(response.confirmModal);

@@ -69,7 +69,7 @@
                   </div>
               </div>
               <!-- Case de consentement pour la politique des données personnelles -->
-              <div class="form-group">
+              <div class="form-group container">
                   <div class="form-check">
                       <input class="form-check-input" type="checkbox" id="dataPolicyConsent" name="dataPolicyConsent" required>
                       <label class="form-check-label" for="dataPolicyConsent">
