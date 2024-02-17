@@ -267,4 +267,4 @@
 </table>
 <!-- //Table total -->
 {/if}
-{$everpsquotationmentions}
+{if isset($everpsquotationmentions) && $everpsquotationmentions}{$everpsquotationmentions}{/if}

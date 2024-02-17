@@ -18,7 +18,7 @@
 <table style="width: 100%;">
     <tr>
         <td style="text-align: center; font-size: 6pt; color: #444;  width:100%;line-height:5px;">
-            {if isset($everpsquotationtext)}{$everpsquotationtext nofilter}{/if}
+            {if isset($everpsquotationtext) && $everpsquotationtext}{$everpsquotationtext nofilter}{/if}
         </td>
     </tr>
 </table>

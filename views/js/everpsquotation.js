@@ -8,6 +8,7 @@ $(document).ready(function() {
             data: formData,
             dataType: 'json',
             success: function(response) {
+                $('#everpsquotationform').remove();
                 // Insérer le tag GTM dans le DOM
                 if (response.gtm) {
                     // Vérification et traitement des données pour GTM
@@ -62,6 +63,7 @@ $(document).ready(function() {
             type: 'POST',
             dataType: 'json',
             success: function(response) {
+                $('#everpscartquotation').remove();
                 // Insérer le tag GTM dans le DOM
                 if (response.gtm) {
                     // Vérification et traitement des données pour GTM
