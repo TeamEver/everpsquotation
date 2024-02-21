@@ -113,7 +113,7 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
             $newDateTimestamp = strtotime($everpsquotation->date_add . " +{$this->duration} days");
 
             // Formater la nouvelle date au format 'd/m/Y'
-            $deadline = date('d/m/Y', $newDateTimestamp);
+            $deadline = date('Y-m-d h:m:s', $newDateTimestamp);
         } else {
             $deadline = false;
         }
