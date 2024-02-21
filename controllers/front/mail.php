@@ -59,11 +59,11 @@ class EverpsquotationMailModuleFrontController extends ModuleFrontController
                 'message' => $this->l('You have to consent our data policy terms'),
             ]));
         }
-        $firstName = Tools::getValue('everfirstName');
-        $lastName = Tools::getValue('everlastName');
-        $email = Tools::getValue('everemail');
-        $phone = Tools::getValue('everphone');
-        $contacted = Tools::getValue('evercontacted');
+        $firstName = Tools::getValue('quotefirstName');
+        $lastName = Tools::getValue('quotelastName');
+        $email = Tools::getValue('quoteemail');
+        $phone = Tools::getValue('quotephone');
+        $contacted = Tools::getValue('contacted');
         $sent = $this->sendQuoteAdminMail($firstName, $lastName, $email, $phone, $contacted);
         die(json_encode([
             'sent' => $sent,
