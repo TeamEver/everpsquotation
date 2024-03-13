@@ -8,7 +8,6 @@ $(document).ready(function() {
             data: formData,
             dataType: 'json',
             success: function(response) {
-                $('#everpsquotationform').remove();
                 // Insérer le tag GTM dans le DOM
                 if (response.gtm) {
                     // Vérification et traitement des données pour GTM
@@ -18,7 +17,7 @@ $(document).ready(function() {
                                 'productId': product.product_id,
                                 'productAttributeId': product.product_attribute_id,
                                 'productCustomizationId': product.id_customization,
-                                'productName': product.product_name,
+                                'productName': product.product_name + ' ' + product.name,
                                 'productReference': product.product_reference,
                                 'productEan13': product.product_ean13,
                                 'productQuantity': product.product_quantity,
@@ -34,7 +33,6 @@ $(document).ready(function() {
                                 'productReductionAmountTaxExcluded': product.reduction_amount_tax_excl
                             };
                         });
-
                         window.dataLayer = window.dataLayer || [];
                         window.dataLayer.push({
                             'event': response.gtm.quoteEvent,
@@ -63,17 +61,23 @@ $(document).ready(function() {
             type: 'POST',
             dataType: 'json',
             success: function(response) {
-                $('#everpscartquotation').remove();
                 // Insérer le tag GTM dans le DOM
+                    console.log(response);
                 if (response.gtm) {
                     // Vérification et traitement des données pour GTM
-                    if (response.quoteEvent && response.quoteId && response.quoteCustomer && response.quoteCurrency && response.quoteShopName && response.quoteProducts) {
-                        var quoteProductsArray = response.quoteProducts.map(function(product) {
+                    if (response.gtm.quoteEvent
+                        && response.gtm.quoteId
+                        && response.gtm.quoteCustomer
+                        && response.gtm.quoteCurrency
+                        && response.gtm.quoteShopName
+                        && response.gtm.quoteProducts
+                    ) {
+                        var quoteProductsArray = response.gtm.quoteProducts.map(function(product) {
                             return {
                                 'productId': product.product_id,
                                 'productAttributeId': product.product_attribute_id,
                                 'productCustomizationId': product.id_customization,
-                                'productName': product.name,
+                                'productName': product.product_name + ' ' + product.name,
                                 'productReference': product.product_reference,
                                 'productEan13': product.product_ean13,
                                 'productQuantity': product.quantity,
@@ -92,11 +96,11 @@ $(document).ready(function() {
 
                         window.dataLayer = window.dataLayer || [];
                         window.dataLayer.push({
-                            'event': response.quoteEvent,
-                            'quoteId': response.quoteId,
-                            'customer_email': response.quoteCustomer.email,
-                            'currency': response.quoteCurrency.name,
-                            'quoteShopName': response.quoteShopName,
+                            'event': response.gtm.quoteEvent,
+                            'quoteId': response.gtm.quoteId,
+                            'customer_email': response.gtm.quoteCustomer.email,
+                            'currency': response.gtm.quoteCurrency.name,
+                            'quoteShopName': response.gtm.quoteShopName,
                             'quoteProducts': quoteProductsArray
                         });
                     }

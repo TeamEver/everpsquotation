@@ -39,7 +39,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '5.0.3';
+        $this->version = '5.1.0';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -484,6 +484,26 @@ class Everpsquotation extends PaymentModule
                         ],
                     ],
                     [
+                        'type' => 'switch',
+                        'label' => $this->l('Suggest unlogged users to log in ?'),
+                        'desc' => $this->l('Suggests people who are not logged in to log in or create an account'),
+                        'hint' => $this->l('Else a custom modal will be shown'),
+                        'name' => 'EVERPSQUOTATION_SUGGEST_CONNECT_UNLOGGED',
+                        'is_bool' => true,
+                        'values' => [
+                            [
+                                'id' => 'active_on',
+                                'value' => true,
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
+                                'id' => 'active_off',
+                                'value' => false,
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'categories',
                         'name' => 'EVERPSQUOTATION_CATEGORIES',
                         'label' => $this->l('Category'),
@@ -556,6 +576,11 @@ class Everpsquotation extends PaymentModule
             }
             if (Tools::getValue('EVERPSQUOTATION_RENDER_ON_VALIDATION')
                 && !Validate::isBool(Tools::getValue('EVERPSQUOTATION_RENDER_ON_VALIDATION'))
+            ) {
+                $this->postErrors[] = $this->l('Error: render PDF on validation is not valid');
+            }
+            if (Tools::getValue('EVERPSQUOTATION_SUGGEST_CONNECT_UNLOGGED')
+                && !Validate::isBool(Tools::getValue('EVERPSQUOTATION_SUGGEST_CONNECT_UNLOGGED'))
             ) {
                 $this->postErrors[] = $this->l('Error: render PDF on validation is not valid');
             }
@@ -707,6 +732,11 @@ class Everpsquotation extends PaymentModule
         );
 
         Configuration::updateValue(
+            'EVERPSQUOTATION_SUGGEST_CONNECT_UNLOGGED',
+            Tools::getValue('EVERPSQUOTATION_SUGGEST_CONNECT_UNLOGGED')
+        );
+
+        Configuration::updateValue(
             'EVERPSQUOTATION_TRANSACTION_ID',
             Tools::getValue('EVERPSQUOTATION_TRANSACTION_ID')
         );
@@ -820,7 +850,13 @@ class Everpsquotation extends PaymentModule
                 Configuration::get(
                     'EVERPSQUOTATION_RENDER_ON_VALIDATION'
                 )
-            ),            
+            ),
+            'EVERPSQUOTATION_SUGGEST_CONNECT_UNLOGGED' => Tools::getValue(
+                'EVERPSQUOTATION_SUGGEST_CONNECT_UNLOGGED',
+                Configuration::get(
+                    'EVERPSQUOTATION_SUGGEST_CONNECT_UNLOGGED'
+                )
+            ),
             'EVERPSQUOTATION_MAIL_SUBJECT' => self::getConfigInMultipleLangs(
                 'EVERPSQUOTATION_MAIL_SUBJECT'
             ),
@@ -967,6 +1003,10 @@ class Everpsquotation extends PaymentModule
 
     public function hookDisplayShoppingCartFooter()
     {
+        $suggestLogIn = Configuration::get('EVERPSQUOTATION_SUGGEST_CONNECT_UNLOGGED');
+        if ((bool) $suggestLogIn === true && !$this->context->customer->isLogged()) {
+            return;
+        }
         return $this->display(__FILE__, 'views/templates/hook/form.tpl');
     }
 

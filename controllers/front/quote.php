@@ -124,12 +124,12 @@ class EverpsquotationQuoteModuleFrontController extends ModuleFrontController
             (int) $quote->id_currency
         );
         $dataForGTM = [
-            'quoteEvent' => $this->l('quotation'),
+            'quoteEvent' => 'requestForQuote',
             'quoteId' => (int) $quote->id,
             'quoteIdCustomer' => (int) $quote->id_customer,
             'quoteProducts' => $quoteDetails,
             'quoteCustomer' => $quoteCustomer,
-            'quoteCurrency' => $quoteCurrency,
+            'quoteCurrency' => $quoteCurrency->name,
             'quoteShopName' => Configuration::get('PS_SHOP_NAME'),
         ];
         return $dataForGTM;
@@ -535,6 +535,12 @@ class EverpsquotationQuoteModuleFrontController extends ModuleFrontController
 
     private function renderModal()
     {
+        $suggestLogIn = Configuration::get('EVERPSQUOTATION_SUGGEST_CONNECT_UNLOGGED');
+        if ((bool) $suggestLogIn === true) {
+            $this->context->smarty->assign(array(
+                'suggestLogIn' => $suggestLogIn,
+            ));
+        }
         return $this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->module->name . '/views/templates/front/modal.tpl');
     }
 }

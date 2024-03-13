@@ -29,6 +29,12 @@
       </div>
       <!-- Contenu de la modale (Votre formulaire) -->
       <div class="modal-body">
+          {if isset($suggestLogIn) && $suggestLogIn}
+          <div class="alert alert-warning">
+            <p>{l s='You must be logged in with a registered address in order to download a quote.' mod='everpsquotation'}</p>
+            <a href="{$urls.pages.authentication}" class="btn btn-primary">{l s='Login to my account' mod='everpsquotation'}</a>
+          </div>
+          {else}
           <form id="everquotationAskForQuote">
               <!-- Champ prénom -->
               <div class="form-group">
@@ -79,6 +85,7 @@
               </div>
               <button type="submit" class="btn btn-primary">{l s='Submit' mod='everpsquotation'}</button>
           </form>
+          {/if}
       </div>
     </div>
   </div>

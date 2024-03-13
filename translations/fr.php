@@ -86,7 +86,6 @@ $_MODULE['<{everpsquotation}prestashop>mail_46ace2ee4f437816c4d7cc2c3c88d137'] =
 $_MODULE['<{everpsquotation}prestashop>mail_93cba07454f06a4a960172bbd6e2a435'] = 'Oui';
 $_MODULE['<{everpsquotation}prestashop>mail_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Non';
 $_MODULE['<{everpsquotation}prestashop>quotations_b423cfa40750b96c794447f27fa4cf87'] = 'Mes devis';
-$_MODULE['<{everpsquotation}prestashop>quote_217a1c88b65aad1909d7f005e65a742e'] = 'devis';
 $_MODULE['<{everpsquotation}prestashop>validation_8471f68e6bc1c67e47b143e72760c837'] = 'Devis enregistré';
 $_MODULE['<{everpsquotation}prestashop>configure_6045227ab0f0f2dd7f2c072f958e20f3'] = 'Comment autoriser la création de devis sur votre boutique ?';
 $_MODULE['<{everpsquotation}prestashop>configure_455e1ea883e0372022d4c65878fa9560'] = 'En premier, vos produits doivent être actifs, disponibles à la vente, avec le prix affiché.';
@@ -128,6 +127,8 @@ $_MODULE['<{everpsquotation}prestashop>everquotation_content_b76c1a1463e45cece93
 $_MODULE['<{everpsquotation}prestashop>everquotation_content_7bf753e0cbb2d38818ba2a3ee3b36f4d'] = 'Total taxes';
 $_MODULE['<{everpsquotation}prestashop>everquotation_content_f617c53a5521d2c3be8cd30653e76ee3'] = 'Total TTC';
 $_MODULE['<{everpsquotation}prestashop>modal_87e7af63c3cd88c47cb5df286692df1f'] = 'Demander un devis';
+$_MODULE['<{everpsquotation}prestashop>modal_30942e7e0ab0da405ac4a965ac25e149'] = 'Vous devez être connecté avec une adresse enregistrée afin de pouvoir télécharger un devis.';
+$_MODULE['<{everpsquotation}prestashop>modal_9e7d26d3a67f5fc2e4a59bd036856041'] = 'Connexion';
 $_MODULE['<{everpsquotation}prestashop>modal_04176f095283bc729f1e3926967e7034'] = 'Prénom';
 $_MODULE['<{everpsquotation}prestashop>modal_dff4bf10409100d989495c6d5486035e'] = 'Nom';
 $_MODULE['<{everpsquotation}prestashop>modal_ce8ae9da5b7cd6c3df2929543a9af92d'] = 'Email';
