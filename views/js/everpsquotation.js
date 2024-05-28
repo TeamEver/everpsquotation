@@ -36,7 +36,6 @@ $(document).ready(function() {
                         window.dataLayer = window.dataLayer || [];
                         window.dataLayer.push({
                             'event': response.gtm.quoteEvent,
-                            'quoteEventId': quotation_event_id,
                             'quoteId': response.gtm.quoteId,
                             // 'customer_email': response.gtm.quoteCustomer.email,
                             'currency': response.gtm.quoteCurrency.name,
@@ -129,7 +128,6 @@ $(document).ready(function() {
                 window.dataLayer = window.dataLayer || [];
                 window.dataLayer.push({
                     'event': 'requestForQuote',
-                    'quoteEventId': quotation_event_id,
                 });
                 if (response.confirmModal) {
                     $('body').append(response.confirmModal);

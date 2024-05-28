@@ -39,7 +39,7 @@ class Everpsquotation extends PaymentModule
     {
         $this->name = 'everpsquotation';
         $this->tab = 'payments_gateways';
-        $this->version = '5.1.0';
+        $this->version = '5.1.1';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -512,15 +512,6 @@ class Everpsquotation extends PaymentModule
                         'required' => true,
                         'tree' => $tree,
                     ],
-                    [
-                        'col' => 3,
-                        'type' => 'text',
-                        'lang' => false,
-                        'label' => $this->l('Conversion ID for Google Ads'),
-                        'desc' => $this->l('Please set here transaction id for Google Ads, such as AW-XXXXXXXXX/XXXXXXXXXXX'),
-                        'hint' => $this->l('Will be used to track quotation creation using Google Ads'),
-                        'name' => 'EVERPSQUOTATION_TRANSACTION_ID',
-                    ],
                 ],
                 'submit' => [
                     'title' => $this->l('Save'),
@@ -736,11 +727,6 @@ class Everpsquotation extends PaymentModule
             Tools::getValue('EVERPSQUOTATION_SUGGEST_CONNECT_UNLOGGED')
         );
 
-        Configuration::updateValue(
-            'EVERPSQUOTATION_TRANSACTION_ID',
-            Tools::getValue('EVERPSQUOTATION_TRANSACTION_ID')
-        );
-
         /* Uploads image */
         $type = Tools::strtolower(Tools::substr(strrchr($_FILES['image']['name'], '.'), 1));
         $imagesize = @getimagesize($_FILES['image']['tmp_name']);
@@ -872,9 +858,6 @@ class Everpsquotation extends PaymentModule
             'EVERPSQUOTATION_DURATION' => Configuration::get(
                 'EVERPSQUOTATION_DURATION'
             ),
-            'EVERPSQUOTATION_TRANSACTION_ID' => Configuration::get(
-                'EVERPSQUOTATION_TRANSACTION_ID'
-            ),
         ];
     }
 
@@ -974,7 +957,6 @@ class Everpsquotation extends PaymentModule
         Media::addJsDef([
             $this->name . '_quote_link ' => $quoteAjaxLink,
             $this->name . '_quoterequest_link ' => $quoteRequestAjaxLink,
-            'quotation_event_id' => Configuration::get('EVERPSQUOTATION_TRANSACTION_ID'),
         ]);
         if ($controller_name == 'product') {
             $this->context->controller->addJs($this->_path.'views/js/createProductQuote.js');

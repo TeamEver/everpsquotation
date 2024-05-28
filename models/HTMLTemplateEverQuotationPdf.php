@@ -35,12 +35,12 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
         $this->pdfDir = _PS_MODULE_DIR_ . 'everpsquotation/views/templates/front/pdf/';
         $this->context = Context::getContext();
         $this->shop = new Shop(Context::getContext()->shop->id);
-        $this->lang = new Language((int)Context::getContext()->language->id);
-        $this->text = $text[(int)Context::getContext()->language->id];
-        $this->mentions = $mentions[(int)Context::getContext()->language->id];
+        $this->lang = new Language((int) Context::getContext()->language->id);
+        $this->text = $text[(int) Context::getContext()->language->id];
+        $this->mentions = $mentions[(int) Context::getContext()->language->id];
         $this->duration = Configuration::get('EVERPSQUOTATION_DURATION');
-        $this->filename = $filename[(int)Context::getContext()->language->id]
-        .$this->id_everpsquotation_quotes;
+        $this->filename = $filename[(int) Context::getContext()->language->id]
+        . $this->id_everpsquotation_quotes;
     }
 
     /**
@@ -50,7 +50,7 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
     public function getContent()
     {
         $everpsquotation = new EverpsquotationClass(
-            (int)$this->id_everpsquotation_quotes
+            (int) $this->id_everpsquotation_quotes
         );
         $everpsquotation->date_add = date(
             'd/m/Y',
@@ -63,19 +63,19 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
         );
         $customizations = array();
         foreach ($details as $detail) {
-            if ((int)$detail['id_customization']) {
+            if ((int) $detail['id_customization']) {
                 $custs = EverpsquotationDetail::getCustomizationValue(
-                    (int)$detail['id_customization']
+                    (int) $detail['id_customization']
                 );
-                $customizations[] = array(
-                    'product_id' => (int)$detail['product_id'],
-                    'customizations' => $custs
-                );
+                $customizations[] = [
+                    'product_id' => (int) $detail['product_id'],
+                    'customizations' => $custs,
+                ];
             }
         }
         $total_taxes = $everpsquotation->total_paid_tax_incl - $everpsquotation->total_paid_tax_excl;
 
-        $this->smarty->assign(array(
+        $this->smarty->assign([
             '_PS_VERSION_' => _PS_VERSION_,
             'details' => $details,
             'customizations' => $customizations,
@@ -95,7 +95,7 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
             'total_taxes' => $total_taxes,
             'date_add' => $everpsquotation->date_add,
             'everpsquotationmentions' => $this->mentions,
-        ));
+        ]);
 
         return $this->smarty->fetch($this->pdfDir . '/everquotation_content.tpl');
     }
@@ -118,17 +118,17 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
             $deadline = false;
         }
 
-        if (file_exists(_PS_MODULE_DIR_.'everpsquotation/views/img/quotation.jpg')) {
-            $pathLogo = _PS_MODULE_DIR_.'everpsquotation/views/img/quotation.jpg';
+        if (file_exists(_PS_MODULE_DIR_ . 'everpsquotation/views/img/quotation.jpg')) {
+            $pathLogo = _PS_MODULE_DIR_ . 'everpsquotation/views/img/quotation.jpg';
         } else {
-            $pathLogo = __PS_BASE_URI__.'img/'.Configuration::get(
+            $pathLogo = __PS_BASE_URI__ . 'img/' . Configuration::get(
                 'PS_LOGO'
             );
         }
-        $width = (int)Configuration::get('EVERPSQUOTATION_LOGO_WIDTH');
+        $width = (int) Configuration::get('EVERPSQUOTATION_LOGO_WIDTH');
       
 
-        $this->smarty->assign(array(
+        $this->smarty->assign([
             'deadline' => $deadline,
             'id_everpsquotation_quotes' => $this->id_everpsquotation_quotes,
             'prefix' => Configuration::get('EVERPSQUOTATION_PREFIX'),
@@ -140,9 +140,9 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
             'shop_address' => $shop_address,
             'logo_path' => $pathLogo,
             'width_logo' => $width,
-            'shop_phone' => Configuration::get('PS_SHOP_PHONE', null, null, (int)$id_shop),
-            'shop_email' => Configuration::get('PS_SHOP_EMAIL', null, null, (int)$id_shop),
-        ));
+            'shop_phone' => Configuration::get('PS_SHOP_PHONE', null, null, (int) $id_shop),
+            'shop_email' => Configuration::get('PS_SHOP_EMAIL', null, null, (int) $id_shop),
+        ]);
 
         return $this->smarty->fetch($this->pdfDir . '/everquotation_header.tpl');
     }

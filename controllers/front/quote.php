@@ -182,17 +182,16 @@ class EverpsquotationQuoteModuleFrontController extends ModuleFrontController
 
         // Then add product
         $ever_cart->addProductToQuoteCart(
-            (int)$id_product,
-            (int)$id_product_attribute,
-            (int)$id_customization,
-            (int)$qty
+            (int) $id_product,
+            (int) $id_product_attribute,
+            (int) $id_customization,
+            (int) $qty
         );
 
         // Get ever cart informations
         $cart_details = $ever_cart->getSummaryDetails(
-            (int)$cart->id
+            (int) $cart->id
         );
-        // die(var_dump($cart_details));
         $cart_products = $ever_cart->getProducts();
 
         // Now create quotation
@@ -247,7 +246,6 @@ class EverpsquotationQuoteModuleFrontController extends ModuleFrontController
             $total = (float) $price_without_tax * (int) $cart_product['cart_quantity'];
             // $product_taxes = $price_with_tax - $price_without_tax;
             // $total_product_taxes = $total_wt - $total;
-            // die(var_dump($price_without_tax));
             $quotedetail = new EverpsquotationDetail();
             $quotedetail->id_everpsquotation_quotes = (int) $quote->id;
             // $quotedetail->id_warehouse = (int)$cart_details['total_discounts']['id_warehouse'];
@@ -347,7 +345,7 @@ class EverpsquotationQuoteModuleFrontController extends ModuleFrontController
         }
         parent::initContent();
 
-        $customer = new Customer((int)$cart->id_customer);
+        $customer = new Customer((int) $cart->id_customer);
 
         if (!Validate::isLoadedObject($customer)) {
             Tools::redirect('index.php?controller=order&step=1');
@@ -369,7 +367,7 @@ class EverpsquotationQuoteModuleFrontController extends ModuleFrontController
 
         Hook::exec('actionBeforeCreateEverQuote');
         $id_quote_cart = EverpsquotationCart::copyCartToQuoteCart(
-            (int)$cart->id
+            (int) $cart->id
         );
         if (!Validate::isInt($id_quote_cart)) {
             die($this->trans('An error has occured.', array(), 'Modules.Everpsquotation.Shop'));
@@ -380,31 +378,31 @@ class EverpsquotationQuoteModuleFrontController extends ModuleFrontController
             $cartproducts = $cart->getProducts();
 
             $quote = new EverpsquotationClass();
-            $quote->reference = (string)Configuration::get('EVERPSQUOTATION_PREFIX');
-            $quote->id_shop_group = (int)$cart->id_shop_group;
-            $quote->id_shop = (int)$cart->id_shop;
-            $quote->id_carrier = (int)$cart->id_carrier;
-            $quote->id_lang = (int)$cart->id_lang;
-            $quote->id_customer = (int)$cart->id_customer;
-            $quote->id_cart = (int)$cart->id;
-            $quote->id_currency = (int)$cart->id_currency;
-            $quote->id_address_delivery = (int)$cart->id_address_delivery;
-            $quote->id_address_invoice = (int)$cart->id_address_invoice;
-            $quote->secure_key = (string)$cart->secure_key;
-            $quote->recyclable = (int)$cart->recyclable;
-            $quote->total_discounts = (float)$cartdetails['total_discounts'];
-            $quote->total_discounts_tax_incl = (float)$cartdetails['total_discounts'];
-            $quote->total_discounts_tax_excl = (float)$cartdetails['total_discounts_tax_exc'];
-            $quote->total_paid_tax_incl = (float)$cartdetails['total_price'];
-            $quote->total_paid_tax_excl = (float)$cartdetails['total_price_without_tax'];
-            $quote->total_products = (float)$cartdetails['total_products'];
-            $quote->total_products_wt = (float)$cartdetails['total_products_wt'];
-            $quote->total_shipping = (float)$cartdetails['total_shipping'];
-            $quote->total_shipping_tax_incl = (float)$cartdetails['total_shipping'];
-            $quote->total_shipping_tax_excl = (float)$cartdetails['total_shipping_tax_exc'];
-            $quote->total_wrapping = (float)$cartdetails['total_wrapping'];
-            $quote->total_wrapping_tax_incl = (float)$cartdetails['total_wrapping'];
-            $quote->total_wrapping_tax_excl = (float)$cartdetails['total_wrapping_tax_exc'];
+            $quote->reference = (string) Configuration::get('EVERPSQUOTATION_PREFIX');
+            $quote->id_shop_group = (int) $cart->id_shop_group;
+            $quote->id_shop = (int) $cart->id_shop;
+            $quote->id_carrier = (int) $cart->id_carrier;
+            $quote->id_lang = (int) $cart->id_lang;
+            $quote->id_customer = (int) $cart->id_customer;
+            $quote->id_cart = (int) $cart->id;
+            $quote->id_currency = (int) $cart->id_currency;
+            $quote->id_address_delivery = (int) $cart->id_address_delivery;
+            $quote->id_address_invoice = (int) $cart->id_address_invoice;
+            $quote->secure_key = (string) $cart->secure_key;
+            $quote->recyclable = (int) $cart->recyclable;
+            $quote->total_discounts = (float) $cartdetails['total_discounts'];
+            $quote->total_discounts_tax_incl = (float) $cartdetails['total_discounts'];
+            $quote->total_discounts_tax_excl = (float) $cartdetails['total_discounts_tax_exc'];
+            $quote->total_paid_tax_incl = (float) $cartdetails['total_price'];
+            $quote->total_paid_tax_excl = (float) $cartdetails['total_price_without_tax'];
+            $quote->total_products = (float) $cartdetails['total_products'];
+            $quote->total_products_wt = (float) $cartdetails['total_products_wt'];
+            $quote->total_shipping = (float) $cartdetails['total_shipping'];
+            $quote->total_shipping_tax_incl = (float) $cartdetails['total_shipping'];
+            $quote->total_shipping_tax_excl = (float) $cartdetails['total_shipping_tax_exc'];
+            $quote->total_wrapping = (float) $cartdetails['total_wrapping'];
+            $quote->total_wrapping_tax_incl = (float) $cartdetails['total_wrapping'];
+            $quote->total_wrapping_tax_excl = (float) $cartdetails['total_wrapping_tax_exc'];
             $quote->valid = 0;
             $quote->date_add = date('Y-m-d H:i:s');
             $quote->date_upd = date('Y-m-d H:i:s');
@@ -413,26 +411,26 @@ class EverpsquotationQuoteModuleFrontController extends ModuleFrontController
             //Now create new Everpsquotationdetail object
             foreach ($cartproducts as $cartproduct) {
                 $quotedetail = new EverpsquotationDetail();
-                $quotedetail->id_everpsquotation_quotes = (int)$quote->id;
-                $quotedetail->id_shop = (int)$cartproduct['id_shop'];
-                $quotedetail->product_id = (int)$cartproduct['id_product'];
-                $quotedetail->product_attribute_id = (int)$cartproduct['id_product_attribute'];
-                $quotedetail->id_customization = (int)$cartproduct['id_customization'];
-                $quotedetail->product_name = (string)$cartproduct['name'];
-                $quotedetail->product_quantity = (int)$cartproduct['cart_quantity'];
-                $quotedetail->product_quantity_in_stock = (int)$cartproduct['stock_quantity'];
+                $quotedetail->id_everpsquotation_quotes = (int) $quote->id;
+                $quotedetail->id_shop = (int) $cartproduct['id_shop'];
+                $quotedetail->product_id = (int) $cartproduct['id_product'];
+                $quotedetail->product_attribute_id = (int) $cartproduct['id_product_attribute'];
+                $quotedetail->id_customization = (int) $cartproduct['id_customization'];
+                $quotedetail->product_name = (string) $cartproduct['name'];
+                $quotedetail->product_quantity = (int) $cartproduct['cart_quantity'];
+                $quotedetail->product_quantity_in_stock = (int) $cartproduct['stock_quantity'];
                 $quotedetail->product_price = $cartproduct['price'];
-                $quotedetail->product_ean13 = (string)$cartproduct['ean13'];
-                $quotedetail->product_isbn = (string)$cartproduct['isbn'];
-                $quotedetail->product_upc = (string)$cartproduct['upc'];
-                $quotedetail->product_reference = (string)$cartproduct['reference'];
-                $quotedetail->product_supplier_reference = (string)$cartproduct['supplier_reference'];
-                $quotedetail->product_weight = (float)$cartproduct['weight'];
-                $quotedetail->tax_name = (string)$cartproduct['tax_name'];
-                $quotedetail->ecotax = (float)$cartproduct['ecotax'];
-                $quotedetail->unit_price_tax_excl = (float)$cartproduct['price'];
-                $quotedetail->total_price_tax_incl = (float)$cartproduct['total_wt'];
-                $quotedetail->total_price_tax_excl = (float)$cartproduct['total'];
+                $quotedetail->product_ean13 = (string) $cartproduct['ean13'];
+                $quotedetail->product_isbn = (string) $cartproduct['isbn'];
+                $quotedetail->product_upc = (string) $cartproduct['upc'];
+                $quotedetail->product_reference = (string) $cartproduct['reference'];
+                $quotedetail->product_supplier_reference = (string) $cartproduct['supplier_reference'];
+                $quotedetail->product_weight = (float) $cartproduct['weight'];
+                $quotedetail->tax_name = (string) $cartproduct['tax_name'];
+                $quotedetail->ecotax = (float) $cartproduct['ecotax'];
+                $quotedetail->unit_price_tax_excl = (float) $cartproduct['price'];
+                $quotedetail->total_price_tax_incl = (float) $cartproduct['total_wt'];
+                $quotedetail->total_price_tax_excl = (float) $cartproduct['total'];
                 $quotedetail->add();
             }
             Hook::exec('actionAfterCreateEverQuote');
@@ -454,7 +452,7 @@ class EverpsquotationQuoteModuleFrontController extends ModuleFrontController
             $id_shop = (int) Context::getContext()->shop->id;
             $mailDir = _PS_MODULE_DIR_ . 'everpsquotation/mails/';
             $pdf = new PDF($quote->id, 'EverQuotationPdf', Context::getContext()->smarty);
-            $customerNames = $customer->firstname.' '.$customer->lastname;
+            $customerNames = $customer->firstname . ' ' . $customer->lastname;
             $attachment = array();
             $attachment['content'] = $pdf->render(false);
             $attachment['name'] = $ever_filename;
@@ -465,11 +463,11 @@ class EverpsquotationQuoteModuleFrontController extends ModuleFrontController
                 (string)$subject,
                 array(
                     '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
-                    '{shop_logo}'=>_PS_IMG_DIR_.Configuration::get(
+                    '{shop_logo}'=>_PS_IMG_DIR_ . Configuration::get(
                         'PS_LOGO',
                         null,
                         null,
-                        (int)$id_shop
+                        (int) $id_shop
                     ),
                     '{firstname}' => (string) $customer->firstname,
                     '{lastname}' => (string) $customer->lastname,

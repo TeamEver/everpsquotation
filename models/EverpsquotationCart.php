@@ -252,29 +252,29 @@ class EverpsquotationCart extends ObjectModel
 
     public function addProductToQuoteCart($id_product, $id_product_attribute, $id_customization, $qty)
     {
-        $cart_qty = (int)$this->getProductQtyFromQuoteCart(
-            (int)$id_product,
-            (int)$id_product_attribute,
-            (int)$id_customization
+        $cart_qty = (int) $this->getProductQtyFromQuoteCart(
+            (int) $id_product,
+            (int) $id_product_attribute,
+            (int) $id_customization
         );
         if ($cart_qty > 0) {
             return $this->updateProductToQuoteCart(
-                (int)$id_product,
-                (int)$id_product_attribute,
-                (int)$id_customization,
-                (int)$qty
+                (int) $id_product,
+                (int) $id_product_attribute,
+                (int) $id_customization,
+                (int) $qty
             );
         }
         return Db::getInstance()->insert(
             'everpsquotation_cart_product',
             array(
-                'id_everpsquotation_cart' => (int)$this->id,
-                'id_product' => (int)$id_product,
-                'id_address_delivery' => (int)$this->id_address_delivery,
-                'id_shop' => (int)$this->id_shop,
-                'id_product_attribute' => (int)$id_product_attribute,
-                'id_customization' => (int)$id_customization,
-                'quantity' => (int)$qty,
+                'id_everpsquotation_cart' => (int) $this->id,
+                'id_product' => (int) $id_product,
+                'id_address_delivery' => (int) $this->id_address_delivery,
+                'id_shop' => (int) $this->id_shop,
+                'id_product_attribute' => (int) $id_product_attribute,
+                'id_customization' => (int) $id_customization,
+                'quantity' => (int) $qty,
                 'date_add' => date('Y-m-d H:i:s')
             ),
             false,
@@ -285,14 +285,14 @@ class EverpsquotationCart extends ObjectModel
 
     public function updateProductToQuoteCart($id_product, $id_product_attribute, $id_customization, $qty)
     {
-        $where = 'id_everpsquotation_cart = '.(int)$this->id.' 
-            AND id_product = '.(int)$id_product.' 
-            AND id_product_attribute = '.(int)$id_product_attribute.' 
-            AND id_customization = '.(int)$id_customization;
+        $where = 'id_everpsquotation_cart = ' . (int) $this->id.' 
+            AND id_product = ' . (int) $id_product.' 
+            AND id_product_attribute = ' . (int) $id_product_attribute.' 
+            AND id_customization = ' . (int) $id_customization;
         return Db::getInstance()->update(
             'everpsquotation_cart_product',
             array(
-                'quantity' => (int)$qty
+                'quantity' => (int) $qty
             ),
             $where
         );
@@ -300,10 +300,10 @@ class EverpsquotationCart extends ObjectModel
 
     public function deleteProductFromEverCart($id_product, $id_product_attribute, $id_customization)
     {
-        $where = 'id_everpsquotation_cart = '.(int)$this->id.' 
-            AND id_product = '.(int)$id_product.' 
-            AND id_product_attribute = '.(int)$id_product_attribute.' 
-            AND id_customization = '.(int)$id_customization;
+        $where = 'id_everpsquotation_cart = ' . (int) $this->id . ' 
+            AND id_product = ' . (int) $id_product . ' 
+            AND id_product_attribute = ' . (int) $id_product_attribute . ' 
+            AND id_customization = ' . (int) $id_customization;
         return Db::getInstance()->delete(
             'everpsquotation_cart_product',
             $where
@@ -312,7 +312,7 @@ class EverpsquotationCart extends ObjectModel
 
     public function dropQuoteCartProducts()
     {
-        $where = 'id_everpsquotation_cart = '.(int)$this->id;
+        $where = 'id_everpsquotation_cart = ' . (int) $this->id;
         Db::getInstance()->delete(
             'everpsquotation_cart_product',
             $where
@@ -326,7 +326,7 @@ class EverpsquotationCart extends ObjectModel
     public function getSummaryDetails($id_cart)
     {
         $cart = new Cart(
-            (int)$id_cart
+            (int) $id_cart
         );
         $delivery = new Address((int) $this->id_address_delivery);
         $invoice = new Address((int) $this->id_address_invoice);
@@ -350,18 +350,18 @@ class EverpsquotationCart extends ObjectModel
 
         foreach ($products as $key => &$product) {
             $product['price_without_quantity_discount'] = Product::getPriceStatic(
-                (int)$product['id_product'],
+                (int) $product['id_product'],
                 !Product::getTaxCalculationMethod(),
-                (int)$product['id_product_attribute'],
+                (int) $product['id_product_attribute'],
                 6,
                 null,
                 false,
                 false
             );
             $product['price_wt'] = Product::getPriceStatic(
-                (int)$product['id_product'],
+                (int) $product['id_product'],
                 true,
-                (int)$product['id_product_attribute'],
+                (int) $product['id_product_attribute'],
                 6,
                 null,
                 false,
@@ -417,7 +417,7 @@ class EverpsquotationCart extends ObjectModel
         }
         $id_lang = (int)Context::getContext()->language->id;
         $address = new Address(
-            (int)$this->id_address_delivery
+            (int) $this->id_address_delivery
         );
         $id_country = $address->id_country;
         // Build query
@@ -457,7 +457,7 @@ class EverpsquotationCart extends ObjectModel
             'product_lang',
             'pl',
             'p.`id_product` = pl.`id_product`
-            AND pl.`id_lang` = '.(int)$id_lang.Shop::addSqlRestrictionOnLang(
+            AND pl.`id_lang` = ' . (int) $id_lang . Shop::addSqlRestrictionOnLang(
                 'pl',
                 'cp.id_shop'
             )
@@ -467,7 +467,7 @@ class EverpsquotationCart extends ObjectModel
             'category_lang',
             'cl',
             'product_shop.`id_category_default` = cl.`id_category`
-            AND cl.`id_lang` = '.(int)$id_lang.Shop::addSqlRestrictionOnLang(
+            AND cl.`id_lang` = ' . (int) $id_lang . Shop::addSqlRestrictionOnLang(
                 'cl',
                 'cp.id_shop'
             )
@@ -542,13 +542,13 @@ class EverpsquotationCart extends ObjectModel
             'image_shop',
             'image_shop',
             'image_shop.`id_product` = p.`id_product`
-            AND image_shop.cover=1 AND image_shop.id_shop='.(int)$this->id_shop
+            AND image_shop.cover=1 AND image_shop.id_shop=' . (int) $this->id_shop
         );
         $sql->leftJoin(
             'image_lang',
             'il',
             'il.`id_image` = image_shop.`id_image`
-            AND il.`id_lang` = '.(int)$id_lang
+            AND il.`id_lang` = ' . (int) $id_lang
         );
 
         $result = Db::getInstance()->executeS($sql);
@@ -601,8 +601,6 @@ class EverpsquotationCart extends ObjectModel
             $row['price_without_reduction'] = $additionalRow['price_without_reduction'];
             $row['specific_prices'] = $additionalRow['specific_prices'];
             unset($additionalRow);
-
-
             $this->_products[] = $row;
         }
         return $this->_products;
