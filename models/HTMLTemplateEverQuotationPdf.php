@@ -61,7 +61,7 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
             Context::getContext()->shop->id,
             Context::getContext()->language->id
         );
-        $customizations = array();
+        $customizations = [];
         foreach ($details as $detail) {
             if ((int) $detail['id_customization']) {
                 $custs = EverpsquotationDetail::getCustomizationValue(
@@ -74,6 +74,7 @@ class HTMLTemplateEverQuotationPdf extends HTMLTemplate
             }
         }
         $total_taxes = $everpsquotation->total_paid_tax_incl - $everpsquotation->total_paid_tax_excl;
+        Tools::clearCache();
 
         $this->smarty->assign([
             '_PS_VERSION_' => _PS_VERSION_,
